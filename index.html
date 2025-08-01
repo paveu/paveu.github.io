@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paweł Stępak - Developer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --secondary: #64748b;
+            --bg: #0f172a;
+            --bg-secondary: #1e293b;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --accent: #06b6d4;
+            --success: #10b981;
+        }
+
+        /* Light mode variables */
+        [data-theme="light"] {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --bg: #ffffff;
+            --bg-secondary: #f8fafc;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #0ea5e9;
+            --success: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .theme-toggle {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 0.3rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            margin-left: 1rem;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--primary);
+        }
+
+        .theme-option {
+            padding: 0.4rem 0.8rem;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .theme-option.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .theme-option:not(.active) {
+            color: var(--text-muted);
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: var(--primary);
+        }
+
+        /* Main container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* About section */
+        .about-hero {
+            text-align: center;
+            padding: 4rem 0;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--border) 100%);
+            border-radius: 20px;
+            margin-bottom: 4rem;
+            border: 1px solid var(--border);
+        }
+
+        .about-hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .about-hero p {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .about-text {
+            background: var(--bg);
+            padding: 3rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .about-text h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+        }
+
+        .about-text p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .about-sidebar {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            position: sticky;
+            top: 100px;
+        }
+
+        .skills h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .skill-tag {
+            background: var(--primary);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .contact-links {
+            margin-top: 2rem;
+        }
+
+        .contact-links a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 0.8rem;
+            transition: color 0.3s;
+        }
+
+        .contact-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Blog section */
+        .blog-header {
+            text-align: center;
+            padding: 3rem 0;
+            margin-bottom: 3rem;
+        }
+
+        .blog-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .blog-header p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+
+        .posts-grid {
+            display: grid;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .post-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .post-meta {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .post-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .post-excerpt {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .read-more {
+            color: var(--primary);
+            font-weight: 600;
+            margin-top: 1rem;
+            display: inline-block;
+        }
+
+        /* Full post view */
+        .post-full {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 3rem;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .post-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .post-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .post-header .meta {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .post-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .post-content h1, .post-content h2, .post-content h3 {
+            color: var(--text);
+            margin: 2rem 0 1rem 0;
+        }
+
+        .post-content h2 {
+            font-size: 1.8rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .post-content p {
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .post-content code {
+            background: var(--bg-secondary);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+
+        .post-content pre {
+            background: #1a1a1a !important;
+            border-radius: 12px;
+            margin: 2rem 0;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+        }
+
+        [data-theme="light"] .post-content pre {
+            background: #2d3748 !important;
+        }
+
+        .post-content pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        .post-content blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+            font-style: italic;
+            color: var(--text-muted);
+        }
+
+        .post-content ul, .post-content ol {
+            padding-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .post-content li {
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .back-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: var(--accent);
+            transform: translateX(-5px);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .error {
+            text-align: center;
+            padding: 3rem;
+            color: #ef4444;
+            background: var(--bg-secondary);
+            border: 1px solid #ef4444;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        /* Section visibility */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .about-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .about-hero p {
+                font-size: 1.1rem;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .about-sidebar {
+                position: static;
+            }
+
+            .blog-header h1 {
+                font-size: 2rem;
+            }
+
+            .post-full {
+                padding: 2rem;
+            }
+
+            .post-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="#about" class="logo">stepak.dev</a>
+            <div class="nav-section">
+                <nav>
+                    <ul>
+                        <li><a href="#about" class="nav-link active">About</a></li>
+                        <li><a href="#blog" class="nav-link">Blog</a></li>
+                    </ul>
+                </nav>
+                <div class="theme-toggle" onclick="toggleTheme()">
+                    <div class="theme-option" id="light-option">☀️ Light</div>
+                    <div class="theme-option active" id="dark-option">🌙 Dark</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- About Section -->
+        <section id="about" class="section active">
+            <div class="about-hero">
+                <h1>Hi, I'm Paweł 👋</h1>
+                <p>Full Stack Developer with 12+ years of experience building amazing web applications</p>
+            </div>
+
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>About Me</h2>
+                    <p>
+                        I'm a passionate full stack developer with over 12 years of experience in creating
+                        robust web applications. I specialize in React, Python, and TypeScript, and I love
+                        turning complex problems into elegant solutions.
+                    </p>
+                    <p>
+                        Throughout my career, I've worked with startups and enterprise companies, building
+                        everything from MVPs to large-scale applications. I'm particularly interested in
+                        modern web technologies, developer tooling, and creating great user experiences.
+                    </p>
+                    <p>
+                        When I'm not coding, you'll find me contributing to open source projects, writing
+                        technical articles, or exploring new frameworks and technologies. I believe in
+                        continuous learning and sharing knowledge with the developer community.
+                    </p>
+                </div>
+
+                <div class="about-sidebar">
+                    <div class="skills">
+                        <h3>🚀 Frontend</h3>
+                        <div class="skill-list">
+                            <span class="skill-tag">React</span>
+                            <span class="skill-tag">TypeScript</span>
+                            <span class="skill-tag">Next.js</span>
+                            <span class="skill-tag">Vue.js</span>
+                        </div>
+
+                        <h3>⚡ Backend</h3>
+                        <div class="skill-list">
+                            <span class="skill-tag">Python</span>
+                            <span class="skill-tag">Node.js</span>
+                            <span class="skill-tag">Django</span>
+                            <span class="skill-tag">FastAPI</span>
+                        </div>
+
+                        <h3>🛠️ Tools</h3>
+                        <div class="skill-list">
+                            <span class="skill-tag">Docker</span>
+                            <span class="skill-tag">AWS</span>
+                            <span class="skill-tag">PostgreSQL</span>
+                            <span class="skill-tag">Redis</span>
+                        </div>
+                    </div>
+
+                    <div class="contact-links">
+                        <a href="https://github.com/yourusername" target="_blank">
+                            <span>🐙</span> GitHub
+                        </a>
+                        <a href="https://linkedin.com/in/yourprofile" target="_blank">
+                            <span>💼</span> LinkedIn
+                        </a>
+                        <a href="mailto:your@email.com">
+                            <span>📧</span> Email
+                        </a>
+                        <a href="https://twitter.com/yourusername" target="_blank">
+                            <span>🐦</span> Twitter
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Blog Section -->
+        <section id="blog" class="section">
+            <div class="blog-header">
+                <h1>Blog Posts</h1>
+                <p>Thoughts, tutorials, and experiences from my development journey</p>
+            </div>
+
+            <div id="blog-list">
+                <div class="loading">Loading posts...</div>
+            </div>
+        </section>
+
+        <!-- Single Post Section -->
+        <section id="post" class="section">
+            <button class="back-button" onclick="showBlogList()">← Back to Blog</button>
+            <div id="post-content">
+                <div class="loading">Loading post...</div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const blogPosts = [
+            {
+                id: 'getting-started-with-react-hooks',
+                title: 'Getting Started with React Hooks',
+                date: '2024-01-15',
+                excerpt: 'A comprehensive guide to React Hooks and how they can simplify your component logic.',
+                file: 'posts/getting-started-with-react-hooks.md'
+            },
+            {
+                id: 'python-async-best-practices',
+                title: 'Python Async Programming Best Practices',
+                date: '2024-01-10',
+                excerpt: 'Learn how to write efficient asynchronous Python code with asyncio and best practices.',
+                file: 'posts/python-async-best-practices.md'
+            },
+            {
+                id: 'building-scalable-apis',
+                title: 'Building Scalable APIs with FastAPI',
+                date: '2024-01-05',
+                excerpt: 'Tips and tricks for building high-performance APIs using FastAPI and Python.',
+                file: 'posts/building-scalable-apis.md'
+            }
+        ];
+
+        // Theme handling
+        function toggleTheme() {
+            const html = document.documentElement;
+            const lightOption = document.getElementById('light-option');
+            const darkOption = document.getElementById('dark-option');
+
+            if (html.getAttribute('data-theme') === 'light') {
+                // Switch to dark
+                html.removeAttribute('data-theme');
+                lightOption.classList.remove('active');
+                darkOption.classList.add('active');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                // Switch to light
+                html.setAttribute('data-theme', 'light');
+                lightOption.classList.add('active');
+                darkOption.classList.remove('active');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Initialize theme on page load
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const html = document.documentElement;
+            const lightOption = document.getElementById('light-option');
+            const darkOption = document.getElementById('dark-option');
+
+            if (savedTheme === 'light') {
+                html.setAttribute('data-theme', 'light');
+                lightOption.classList.add('active');
+                darkOption.classList.remove('active');
+            } else {
+                // Default to dark mode
+                html.removeAttribute('data-theme');
+                lightOption.classList.remove('active');
+                darkOption.classList.add('active');
+            }
+        }
+
+        // Navigation handling
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.section');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                showSection(targetId);
+            });
+        });
+
+        function showSection(sectionId) {
+            // Update active nav link
+            navLinks.forEach(l => l.classList.remove('active'));
+            document.querySelector(`[href="#${sectionId}"]`).classList.add('active');
+
+            // Show target section
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // Blog functionality
+        function showBlogList() {
+            showSection('blog');
+            renderBlogList();
+        }
+
+        function showPost(postId) {
+            showSection('post');
+            loadPost(postId);
+        }
+
+        function renderBlogList() {
+            const blogList = document.getElementById('blog-list');
+
+            const postsHtml = blogPosts.map(post => `
+                <div class="post-card" onclick="showPost('${post.id}')">
+                    <div class="post-meta">${formatDate(post.date)}</div>
+                    <h2>${post.title}</h2>
+                    <p class="post-excerpt">${post.excerpt}</p>
+                    <span class="read-more">Read more →</span>
+                </div>
+            `).join('');
+
+            blogList.innerHTML = `<div class="posts-grid">${postsHtml}</div>`;
+        }
+
+        async function loadPost(postId) {
+            const postContent = document.getElementById('post-content');
+            const post = blogPosts.find(p => p.id === postId);
+
+            if (!post) {
+                postContent.innerHTML = '<div class="error">Post not found</div>';
+                return;
+            }
+
+            postContent.innerHTML = '<div class="loading">Loading post...</div>';
+
+            try {
+                const response = await fetch(post.file);
+                if (!response.ok) throw new Error('Post not found');
+
+                const markdown = await response.text();
+                const html = marked.parse(markdown);
+
+                postContent.innerHTML = `
+                    <article class="post-full">
+                        <div class="post-header">
+                            <h1>${post.title}</h1>
+                            <div class="meta">Published on ${formatDate(post.date)}</div>
+                        </div>
+                        <div class="post-content">
+                            ${html}
+                        </div>
+                    </article>
+                `;
+
+                // Apply syntax highlighting
+                setTimeout(() => {
+                    Prism.highlightAll();
+                }, 100);
+
+            } catch (error) {
+                postContent.innerHTML = `
+                    <div class="error">
+                        <h2>Post not found</h2>
+                        <p>The blog post you're looking for doesn't exist or couldn't be loaded.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            renderBlogList();
+        });
+    </script>
+</body>
+</html>
