@@ -118,4 +118,4 @@ Found a bug or have a suggestion? Please open an issue or submit a pull request.
 
 ---
 
-Built with ❤️ by [Your Name](https://github.com/paveu)
+Built with ❤️ by [Paweł Stępak](https://github.com/paveu)
