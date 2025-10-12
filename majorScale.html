@@ -1679,9 +1679,11 @@
         }
 
         function resetApp() {
-            if (config.timer > 0 && timerInterval) {
+            if (config.timer > 0) {
                 if (confirm('Reset will restart the timer. Continue?')) {
-                    clearInterval(timerInterval);
+                    if (timerInterval) {
+                        clearInterval(timerInterval);
+                    }
                     startTimer(config.timer);
                 } else {
                     return;
