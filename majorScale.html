@@ -465,6 +465,26 @@
 
         th .mobile-short {
             display: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tooltip {
+            display: none;
+            position: fixed;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 2px solid var(--accent);
+            font-size: 0.9em;
+            z-index: 10000;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .tooltip.active {
+            display: block;
         }
 
         .header-row-3 th {
@@ -773,17 +793,19 @@
 
             .header-row-2 .full-text,
             .header-row-3 .full-text,
-            .header-row-4 {
+            .header-row-4 .full-text {
                 display: none;
             }
 
             .header-row-2 .mobile-short,
-            .header-row-3 .mobile-short {
+            .header-row-3 .mobile-short,
+            .header-row-4 .mobile-short {
                 display: inline;
             }
 
             .header-row-2 th,
-            .header-row-3 th {
+            .header-row-3 th,
+            .header-row-4 th {
                 font-size: 0.7em;
                 font-style: normal;
                 font-weight: 600;
@@ -985,7 +1007,16 @@
                 'T',
                 { full: 'Octave S', short: 'OS' }
             ],
-            ['Major', 'Minor', 'Minor', 'Major', 'Major', 'Minor', 'Dim', '']
+            [
+                { full: 'Major', short: 'Ma' },
+                { full: 'Minor', short: 'Mi' },
+                { full: 'Minor', short: 'Mi' },
+                { full: 'Major', short: 'Ma' },
+                { full: 'Major', short: 'Ma' },
+                { full: 'Minor', short: 'Mi' },
+                { full: 'Dim', short: 'Di' },
+                ''
+            ]
         ];
 
         // Application state
@@ -1254,6 +1285,8 @@
                     const shortSpan = document.createElement('span');
                     shortSpan.className = 'mobile-short';
                     shortSpan.textContent = 'S';
+                    shortSpan.dataset.fullText = 'Scale';
+                    shortSpan.addEventListener('click', showTooltip);
 
                     scaleHeader.appendChild(fullSpan);
                     scaleHeader.appendChild(shortSpan);
@@ -1274,6 +1307,8 @@
                         const shortSpan = document.createElement('span');
                         shortSpan.className = 'mobile-short';
                         shortSpan.textContent = header.short;
+                        shortSpan.dataset.fullText = header.full;
+                        shortSpan.addEventListener('click', showTooltip);
 
                         th.appendChild(fullSpan);
                         th.appendChild(shortSpan);
@@ -1736,6 +1771,63 @@
 
             document.removeEventListener('click', handleClickOutsideModal, true);
             document.removeEventListener('keydown', handleModalKeyPress, true);
+        }
+
+        function showTooltip(e) {
+            e.stopPropagation();
+
+            const fullText = e.target.dataset.fullText;
+            if (!fullText) return;
+
+            // Remove any existing tooltips
+            const existingTooltip = document.querySelector('.tooltip');
+            if (existingTooltip) {
+                existingTooltip.remove();
+            }
+
+            // Create tooltip
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip active';
+            tooltip.textContent = fullText;
+            document.body.appendChild(tooltip);
+
+            // Position tooltip
+            const rect = e.target.getBoundingClientRect();
+            const tooltipRect = tooltip.getBoundingClientRect();
+
+            let top = rect.bottom + 5;
+            let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+
+            // Adjust if tooltip goes off screen
+            if (left < 10) left = 10;
+            if (left + tooltipRect.width > window.innerWidth - 10) {
+                left = window.innerWidth - tooltipRect.width - 10;
+            }
+
+            if (top + tooltipRect.height > window.innerHeight - 10) {
+                top = rect.top - tooltipRect.height - 5;
+            }
+
+            tooltip.style.top = top + 'px';
+            tooltip.style.left = left + 'px';
+
+            // Remove tooltip after 2 seconds or on next click
+            setTimeout(() => {
+                if (tooltip && tooltip.parentNode) {
+                    tooltip.remove();
+                }
+            }, 2000);
+
+            const removeTooltip = () => {
+                if (tooltip && tooltip.parentNode) {
+                    tooltip.remove();
+                }
+                document.removeEventListener('click', removeTooltip);
+            };
+
+            setTimeout(() => {
+                document.addEventListener('click', removeTooltip);
+            }, 100);
         }
 
         function addChordToCell(dropZone, chord) {
