@@ -1710,6 +1710,18 @@
 
             if (filled === totalCells && correct === totalCells) {
                 progressEl.innerHTML += ` | 🎉 Congratulations! All answers are correct!`;
+
+                // Stop timer if running
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+            } else if (filled === totalCells) {
+                // All cells filled but not all correct - stop timer anyway
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
             }
         }
     </script>
