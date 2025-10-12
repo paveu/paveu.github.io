@@ -67,12 +67,36 @@
         .container {
             max-width: 1600px;
             margin: 0 auto;
+            position: relative;
         }
 
         h1 {
             text-align: center;
             margin-bottom: 30px;
             font-size: 2.5em;
+        }
+
+        /* Back to home link */
+        .back-to-home {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            z-index: 1000;
+        }
+
+        .back-to-home:hover {
+            background: var(--hover-bg);
+            border-color: var(--accent);
+            transform: translateX(-3px);
         }
 
         /* Start screen */
@@ -585,6 +609,11 @@
             user-select: none;
         }
 
+        .modal-option.keyboard-focused {
+            background: var(--accent);
+            color: white;
+        }
+
         .progress {
             margin-top: 20px;
             padding: 15px;
@@ -640,6 +669,8 @@
     <div class="container">
         <!-- Start screen -->
         <div id="startScreen">
+            <a href="https://paveu.pl" class="back-to-home">← Back to paveu.pl</a>
+
             <h1>🎵 Major Scales Trainer</h1>
 
             <div class="config-section">
@@ -708,6 +739,7 @@
                 <ul class="features-list">
                     <li><strong>15 Major Scales</strong> - Practice all major scales from C to Cb</li>
                     <li><strong>Drag & Drop</strong> - Drag chords from the bank or click cells to select</li>
+                    <li><strong>Keyboard Navigation</strong> - Press letter keys to jump to chords in dropdown</li>
                     <li><strong>Custom Practice</strong> - Choose specific scales or practice all at once</li>
                     <li><strong>Smart Validation</strong> - Instant feedback or manual checking</li>
                     <li><strong>Color-Coded Columns</strong> - I/IV/V (red), II/III/VI (blue), VII (green)</li>
@@ -719,6 +751,8 @@
 
         <!-- Main screen -->
         <div id="mainScreen">
+            <a href="https://paveu.pl" class="back-to-home">← Back to paveu.pl</a>
+
             <h1>🎵 Major Scales Trainer</h1>
 
             <div class="controls">
@@ -793,24 +827,17 @@
             populateScaleCheckboxes();
             setupStartScreenListeners();
 
-            // Apply cached state after page load/refresh
-
-            // 1. Exercise Mode - show checkboxes if custom is selected
             const modeRadio = document.querySelector('input[name="mode"]:checked');
             if (modeRadio && modeRadio.value === 'custom') {
                 document.getElementById('scaleCheckboxes').style.display = 'block';
             }
 
-            // 2. Theme - apply cached theme
             const themeRadio = document.querySelector('input[name="theme"]:checked');
             if (themeRadio) {
                 document.documentElement.setAttribute('data-theme', themeRadio.value);
             } else {
                 document.documentElement.setAttribute('data-theme', 'light-minimal');
             }
-
-            // Note: Difficulty Level and Validation Mode don't need initialization
-            // They are only used when clicking START button
         });
 
         function populateScaleCheckboxes() {
@@ -841,7 +868,6 @@
         }
 
         function setupStartScreenListeners() {
-            // Mode selection
             document.querySelectorAll('input[name="mode"]').forEach(radio => {
                 radio.addEventListener('change', (e) => {
                     const checkboxContainer = document.getElementById('scaleCheckboxes');
@@ -849,7 +875,6 @@
                 });
             });
 
-            // Theme selection
             document.querySelectorAll('input[name="theme"]').forEach(radio => {
                 radio.addEventListener('change', (e) => {
                     document.documentElement.setAttribute('data-theme', e.target.value);
@@ -858,10 +883,8 @@
         }
 
         function startApp() {
-            // Collect configuration
             config.mode = document.querySelector('input[name="mode"]:checked').value;
 
-            // Collect selected scales
             if (config.mode === 'custom') {
                 const checkboxes = document.querySelectorAll('#scaleCheckboxes input[type="checkbox"]:checked');
                 config.selectedScales = Array.from(checkboxes).map(cb => cb.value);
@@ -878,10 +901,8 @@
             config.validation = document.querySelector('input[name="validation"]:checked').value;
             config.theme = document.querySelector('input[name="theme"]:checked').value;
 
-            // Set theme
             document.documentElement.setAttribute('data-theme', config.theme);
 
-            // Show check button only if manual validation
             const checkBtn = document.getElementById('checkBtn');
             if (config.validation === 'manual') {
                 checkBtn.style.display = 'inline-block';
@@ -889,11 +910,9 @@
                 checkBtn.style.display = 'none';
             }
 
-            // Switch to main screen
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('mainScreen').style.display = 'block';
 
-            // Build application
             buildChordBank();
             buildTable();
             updateProgress();
@@ -912,20 +931,17 @@
             let chords = [];
 
             if (config.difficulty === 'all') {
-                // All chords
                 Object.values(scales).forEach(scale => {
                     chords = chords.concat(scale.chords);
                 });
                 chords = [...new Set(chords)];
             } else {
-                // Only chords from selected scales
                 config.selectedScales.forEach(scaleName => {
                     chords = chords.concat(scales[scaleName].chords);
                 });
                 chords = [...new Set(chords)];
             }
 
-            // Group chords by base note (A, B, C, D, E, F, G)
             const chordGroups = {
                 'A': [], 'B': [], 'C': [], 'D': [], 'E': [], 'F': [], 'G': []
             };
@@ -937,7 +953,6 @@
                 }
             });
 
-            // Create groups with labels
             ['A', 'B', 'C', 'D', 'E', 'F', 'G'].forEach(note => {
                 if (chordGroups[note].length > 0) {
                     chordGroups[note].sort();
@@ -978,7 +993,6 @@
 
             const thead = document.createElement('thead');
 
-            // 4 header rows
             headerRows.forEach((row, index) => {
                 const headerRow = document.createElement('tr');
                 headerRow.className = 'header-row-' + (index + 1);
@@ -994,16 +1008,14 @@
                     const th = document.createElement('th');
                     th.textContent = header;
 
-                    // Add degree class for row 1
                     if (index === 0 && i < 7) {
                         th.className = 'degree-' + (i + 1);
 
-                        // Add color classes by chord groups
-                        if (i === 0 || i === 3 || i === 4) { // I, IV, V
+                        if (i === 0 || i === 3 || i === 4) {
                             th.classList.add('col-primary');
-                        } else if (i === 1 || i === 2 || i === 5) { // II, III, VI
+                        } else if (i === 1 || i === 2 || i === 5) {
                             th.classList.add('col-secondary');
-                        } else if (i === 6) { // VII
+                        } else if (i === 6) {
                             th.classList.add('col-diminished');
                         }
                     }
@@ -1027,12 +1039,10 @@
                 const scaleCell = document.createElement('td');
                 scaleCell.className = 'scale-cell';
 
-                // Add scale name
                 const scaleName = document.createElement('span');
                 scaleName.textContent = scale;
                 scaleCell.appendChild(scaleName);
 
-                // Add clear row button
                 const clearRowBtn = document.createElement('button');
                 clearRowBtn.className = 'clear-row-btn';
                 clearRowBtn.textContent = '×';
@@ -1045,16 +1055,14 @@
 
                 row.appendChild(scaleCell);
 
-                // 7 cells with chords (drop zones)
                 for (let degree = 0; degree < 7; degree++) {
                     const cell = document.createElement('td');
 
-                    // Add color class to cell
-                    if (degree === 0 || degree === 3 || degree === 4) { // I, IV, V
+                    if (degree === 0 || degree === 3 || degree === 4) {
                         cell.classList.add('cell-primary');
-                    } else if (degree === 1 || degree === 2 || degree === 5) { // II, III, VI
+                    } else if (degree === 1 || degree === 2 || degree === 5) {
                         cell.classList.add('cell-secondary');
-                    } else if (degree === 6) { // VII
+                    } else if (degree === 6) {
                         cell.classList.add('cell-diminished');
                     }
 
@@ -1063,7 +1071,6 @@
                     dropZone.dataset.scale = scale;
                     dropZone.dataset.degree = degree;
 
-                    // Add remove button
                     const removeBtn = document.createElement('button');
                     removeBtn.className = 'remove-btn';
                     removeBtn.textContent = '×';
@@ -1078,7 +1085,6 @@
                     dropZone.addEventListener('dragleave', handleDragLeave);
                     dropZone.addEventListener('drop', handleDrop);
 
-                    // Add click handler for dropdown
                     dropZone.addEventListener('click', function(e) {
                         if (!this.classList.contains('filled')) {
                             showChordDropdown(this);
@@ -1089,7 +1095,6 @@
                     row.appendChild(cell);
                 }
 
-                // 8th column - Num #/b (informational)
                 const infoCell = document.createElement('td');
                 infoCell.textContent = scales[scale].accidentals;
                 infoCell.className = 'info-cell';
@@ -1103,7 +1108,6 @@
             userAnswers = {};
         }
 
-        // Drag and drop handlers
         function handleDragStart(e) {
             draggedChord = e.target.dataset.chord;
             e.target.classList.add('dragging');
@@ -1131,7 +1135,6 @@
 
             let dropZone = e.target;
 
-            // If clicked on remove button, find parent drop-zone
             if (dropZone.classList.contains('remove-btn')) {
                 dropZone = dropZone.parentElement;
             }
@@ -1139,13 +1142,11 @@
             const scale = dropZone.dataset.scale;
             const degree = parseInt(dropZone.dataset.degree);
 
-            // Remove previous chord if exists
             const existingChord = dropZone.querySelector('.chord-text');
             if (existingChord) {
                 existingChord.remove();
             }
 
-            // Add new chord
             const chordText = document.createElement('span');
             chordText.className = 'chord-text';
             chordText.textContent = draggedChord;
@@ -1154,11 +1155,9 @@
             dropZone.classList.add('filled');
             dropZone.classList.remove('correct', 'incorrect');
 
-            // Save answer (don't remove chord from bank - it can be reused)
             const key = scale + '-' + degree;
             userAnswers[key] = draggedChord;
 
-            // Validate instantly if instant mode
             if (config.validation === 'instant') {
                 validateCell(dropZone, scale, degree);
             }
@@ -1167,41 +1166,16 @@
             updateScaleClearButtons();
         }
 
-        function removeChordFromBank(chord) {
-            const chords = document.querySelectorAll('#chordBank .chord');
-            chords.forEach(el => {
-                if (el.dataset.chord === chord && !el.classList.contains('used')) {
-                    el.classList.add('used');
-                    el.style.display = 'none';
-                    return;
-                }
-            });
-        }
-
-        function returnChordToBank(chord) {
-            const chords = document.querySelectorAll('#chordBank .chord');
-            chords.forEach(el => {
-                if (el.dataset.chord === chord && el.classList.contains('used')) {
-                    el.classList.remove('used');
-                    el.style.display = 'inline-block';
-                    return;
-                }
-            });
-        }
-
         function removeChordFromCell(dropZone) {
             const chordText = dropZone.querySelector('.chord-text');
             if (!chordText) return;
 
-            const chord = chordText.textContent.replace(' ✓', '').replace(' ✗', '');
             const scale = dropZone.dataset.scale;
             const degree = parseInt(dropZone.dataset.degree);
             const key = scale + '-' + degree;
 
-            // Remove from answers
             delete userAnswers[key];
 
-            // Clear cell (chord stays in bank - no need to return)
             chordText.remove();
             dropZone.classList.remove('filled', 'correct', 'incorrect');
 
@@ -1212,7 +1186,6 @@
         function clearScaleRow(row) {
             const scale = row.dataset.scale;
 
-            // Find all drop zones in this row
             const dropZones = row.querySelectorAll('.drop-zone');
 
             dropZones.forEach(dropZone => {
@@ -1221,10 +1194,8 @@
                     const degree = parseInt(dropZone.dataset.degree);
                     const key = scale + '-' + degree;
 
-                    // Remove from answers
                     delete userAnswers[key];
 
-                    // Clear cell
                     chordText.remove();
                     dropZone.classList.remove('filled', 'correct', 'incorrect');
                 }
@@ -1235,20 +1206,17 @@
         }
 
         function updateScaleClearButtons() {
-            // Update visibility of clear buttons for each scale row
             const rows = document.querySelectorAll('tbody tr');
 
             rows.forEach(row => {
                 const scaleCell = row.querySelector('.scale-cell');
                 if (!scaleCell) return;
 
-                // Check if any drop zone in this row is filled
                 const dropZones = row.querySelectorAll('.drop-zone');
                 const hasAnyChord = Array.from(dropZones).some(zone =>
                     zone.querySelector('.chord-text')
                 );
 
-                // Toggle has-chords class
                 if (hasAnyChord) {
                     scaleCell.classList.add('has-chords');
                 } else {
@@ -1257,9 +1225,7 @@
             });
         }
 
-        // Chord selection modal
         function showChordDropdown(dropZone) {
-            // Collect available chords
             let availableChords = [];
             const chordElements = document.querySelectorAll('#chordBank .chord:not(.used)');
             chordElements.forEach(el => {
@@ -1267,29 +1233,24 @@
             });
 
             if (availableChords.length === 0) {
-                return; // No available chords
+                return;
             }
 
             availableChords.sort();
 
-            // Save current drop zone
             currentDropZone = dropZone;
 
-            // Get cell position
             const rect = dropZone.getBoundingClientRect();
 
-            // Show modal
             const modal = document.getElementById('chordModal');
 
             modal.innerHTML = '';
 
-            // Get colors from CSS variables
             const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#5c6bc0';
             const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-primary').trim() || '#ffffff';
             const bgTertiary = getComputedStyle(document.documentElement).getPropertyValue('--bg-tertiary').trim();
             const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim();
 
-            // Add close button
             const closeBtn = document.createElement('button');
             closeBtn.className = 'close-modal-btn';
             closeBtn.textContent = '×';
@@ -1332,7 +1293,6 @@
             };
             modal.appendChild(closeBtn);
 
-            // Add chord options
             availableChords.forEach(chord => {
                 const option = document.createElement('div');
                 option.className = 'modal-option';
@@ -1344,7 +1304,6 @@
                 option.style.marginBottom = '2px';
                 option.style.border = '1px solid transparent';
 
-                // Add hover effect
                 option.addEventListener('mouseenter', function() {
                     this.style.backgroundColor = accentColor;
                     this.style.color = 'white';
@@ -1367,18 +1326,15 @@
                 modal.appendChild(option);
             });
 
-            // Default position under cell
             let modalTop = rect.bottom + window.scrollY + 5;
             let modalLeft = rect.left + window.scrollX;
 
-            // Set position and dimensions immediately
             modal.style.position = 'fixed';
             modal.style.zIndex = '10000';
             modal.style.height = '300px';
             modal.style.maxHeight = '300px';
             modal.style.overflowY = 'scroll';
 
-            // Temporarily show modal to measure width
             modal.style.display = 'block';
             modal.style.visibility = 'hidden';
             modal.style.left = '0px';
@@ -1386,27 +1342,22 @@
 
             const modalRect = modal.getBoundingClientRect();
 
-            // Check if modal goes beyond bottom edge (300px height)
             if (modalTop + 300 > window.innerHeight) {
                 modalTop = rect.top + window.scrollY - 300 - 5;
             }
 
-            // Check if modal goes beyond right edge
             if (modalLeft + modalRect.width > window.innerWidth) {
                 modalLeft = window.innerWidth - modalRect.width - 10;
             }
 
-            // Check if modal goes beyond left edge
             if (modalLeft < 0) {
                 modalLeft = 10;
             }
 
-            // Check if modal goes beyond top edge
             if (modalTop < 0) {
                 modalTop = 10;
             }
 
-            // Set final position with full inline styles
             modal.style.left = modalLeft + 'px';
             modal.style.top = modalTop + 'px';
             modal.style.visibility = 'visible';
@@ -1419,22 +1370,48 @@
 
             modal.classList.add('active');
 
-            // Prevent closing when clicking inside modal
             modal.onclick = function(e) {
                 e.stopPropagation();
             };
 
-            // Add click outside handler after a short delay
-            // This prevents the click that opened the modal from immediately closing it
             setTimeout(() => {
                 document.addEventListener('click', handleClickOutsideModal, true);
+                document.addEventListener('keydown', handleModalKeyPress, true);
             }, 100);
+        }
+
+        function handleModalKeyPress(e) {
+            const modal = document.getElementById('chordModal');
+            if (!modal.classList.contains('active')) return;
+
+            const key = e.key.toUpperCase();
+
+            if (key >= 'A' && key <= 'G') {
+                e.preventDefault();
+
+                const options = modal.querySelectorAll('.modal-option');
+
+                options.forEach(opt => opt.classList.remove('keyboard-focused'));
+
+                let foundOption = null;
+                for (let option of options) {
+                    const chordName = option.dataset.chord;
+                    if (chordName.charAt(0).toUpperCase() === key) {
+                        foundOption = option;
+                        break;
+                    }
+                }
+
+                if (foundOption) {
+                    foundOption.classList.add('keyboard-focused');
+                    foundOption.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
         }
 
         function handleClickOutsideModal(e) {
             const modal = document.getElementById('chordModal');
 
-            // Check if click is outside modal
             if (!modal.contains(e.target) && modal.classList.contains('active')) {
                 closeChordModal();
                 document.removeEventListener('click', handleClickOutsideModal, true);
@@ -1446,21 +1423,19 @@
             modal.classList.remove('active');
             modal.style.display = 'none';
 
-            // Clean up event listener
             document.removeEventListener('click', handleClickOutsideModal, true);
+            document.removeEventListener('keydown', handleModalKeyPress, true);
         }
 
         function addChordToCell(dropZone, chord) {
             const scale = dropZone.dataset.scale;
             const degree = parseInt(dropZone.dataset.degree);
 
-            // Clear cell (keep only removeBtn if it was)
             const existingText = dropZone.querySelector('.chord-text');
             if (existingText) {
                 existingText.remove();
             }
 
-            // Add chord text
             const chordText = document.createElement('span');
             chordText.className = 'chord-text';
             chordText.textContent = chord;
@@ -1469,18 +1444,15 @@
             dropZone.classList.add('filled');
             dropZone.classList.remove('correct', 'incorrect');
 
-            // Save answer (chord stays in bank - can be reused)
             const key = scale + '-' + degree;
             userAnswers[key] = chord;
 
-            // Validate instantly if instant mode
             if (config.validation === 'instant') {
                 validateCell(dropZone, scale, degree);
             }
 
             updateProgress();
 
-            // Clear currentDropZone
             currentDropZone = null;
 
             updateScaleClearButtons();
