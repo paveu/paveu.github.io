@@ -269,6 +269,40 @@
             transform: translateY(-2px);
         }
 
+        /* Timer display */
+        .timer-display {
+            padding: 12px 24px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timer-display.warning {
+            color: #f59e0b;
+            border-color: #f59e0b;
+        }
+
+        .timer-display.danger {
+            color: #ef4444;
+            border-color: #ef4444;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
         /* Chord bank */
         .chord-bank {
             flex: 0 0 280px;
@@ -591,8 +625,8 @@
             padding: 8px;
             padding-top: 40px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
-            max-height: 300px;
-            height: 300px;
+            max-height: 350px;
+            height: 350px;
             overflow-y: scroll;
         }
 
@@ -645,12 +679,15 @@
         }
 
         .progress {
-            margin-top: 20px;
-            padding: 15px;
+            padding: 12px 24px;
+            font-size: 1em;
+            font-weight: 600;
+            color: var(--text-primary);
             background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
             border-radius: 8px;
-            text-align: center;
-            font-size: 1.1em;
+            display: inline-flex;
+            align-items: center;
         }
 
         @media (max-width: 768px) {
@@ -749,6 +786,22 @@
             </div>
 
             <div class="config-section">
+                <h3>Practice Timer</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="timer-mode" value="no-timer" checked>
+                        <span>No timer</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="timer-mode" value="custom">
+                        <span>Number of minutes:</span>
+                        <input type="number" id="timerMinutes" min="1" max="120" value="10"
+                               style="margin-left: 10px; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); width: 80px;">
+                    </label>
+                </div>
+            </div>
+
+            <div class="config-section">
                 <h3>Theme</h3>
                 <div class="radio-group">
                     <label class="radio-option">
@@ -788,6 +841,10 @@
             <div class="controls">
                 <button class="btn" onclick="showStartScreen()">← Menu</button>
                 <button class="btn" onclick="resetApp()">🔄 Reset</button>
+                <div id="timerDisplay" class="timer-display" style="display: none;">
+                    ⏱️ <span id="timerText">00:00</span>
+                </div>
+                <div class="progress" id="progress"></div>
                 <button class="btn" id="checkBtn" onclick="checkAllAnswers()">✓ Check</button>
             </div>
 
@@ -803,8 +860,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="progress" id="progress"></div>
         </div>
     </div>
 
@@ -845,12 +900,15 @@
             selectedScales: [],
             difficulty: 'all',
             validation: 'instant',
-            theme: 'light-minimal'
+            theme: 'light-minimal',
+            timer: 0
         };
 
         let userAnswers = {};
         let draggedChord = null;
         let currentDropZone = null;
+        let timerInterval = null;
+        let timerSeconds = 0;
 
         // Initialization
         document.addEventListener('DOMContentLoaded', () => {
@@ -931,6 +989,19 @@
             config.validation = document.querySelector('input[name="validation"]:checked').value;
             config.theme = document.querySelector('input[name="theme"]:checked').value;
 
+            // Get timer configuration
+            const timerMode = document.querySelector('input[name="timer-mode"]:checked').value;
+            if (timerMode === 'custom') {
+                const timerMinutes = parseInt(document.getElementById('timerMinutes').value);
+                if (timerMinutes < 1 || timerMinutes > 120) {
+                    alert('Please enter a valid number of minutes (1-120)');
+                    return;
+                }
+                config.timer = timerMinutes;
+            } else {
+                config.timer = 0;
+            }
+
             document.documentElement.setAttribute('data-theme', config.theme);
 
             const checkBtn = document.getElementById('checkBtn');
@@ -938,6 +1009,15 @@
                 checkBtn.style.display = 'inline-block';
             } else {
                 checkBtn.style.display = 'none';
+            }
+
+            // Setup timer if selected
+            const timerDisplay = document.getElementById('timerDisplay');
+            if (config.timer > 0) {
+                timerDisplay.style.display = 'inline-flex';
+                startTimer(config.timer);
+            } else {
+                timerDisplay.style.display = 'none';
             }
 
             document.getElementById('startScreen').style.display = 'none';
@@ -948,7 +1028,50 @@
             updateProgress();
         }
 
+        function startTimer(minutes) {
+            timerSeconds = minutes * 60;
+            updateTimerDisplay();
+
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                updateTimerDisplay();
+
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    alert('⏰ Time is up! Practice session completed.');
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timerSeconds / 60);
+            const seconds = timerSeconds % 60;
+            const timeText = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+            const timerText = document.getElementById('timerText');
+            const timerDisplay = document.getElementById('timerDisplay');
+
+            timerText.textContent = timeText;
+
+            // Change color based on remaining time
+            timerDisplay.classList.remove('warning', 'danger');
+            if (timerSeconds <= 60) {
+                timerDisplay.classList.add('danger');
+            } else if (timerSeconds <= 180) {
+                timerDisplay.classList.add('warning');
+            }
+        }
+
         function showStartScreen() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
             document.getElementById('mainScreen').style.display = 'none';
             document.getElementById('startScreen').style.display = 'block';
             resetApp();
@@ -1365,8 +1488,8 @@
 
             modal.style.position = 'fixed';
             modal.style.zIndex = '10000';
-            modal.style.height = '300px';
-            modal.style.maxHeight = '300px';
+            modal.style.height = '350px';
+            modal.style.maxHeight = '350px';
             modal.style.overflowY = 'scroll';
 
             modal.style.display = 'block';
@@ -1375,21 +1498,47 @@
             modal.style.top = '0px';
 
             const modalRect = modal.getBoundingClientRect();
+            const modalHeight = 350;
 
-            if (modalTop + 300 > window.innerHeight) {
-                modalTop = rect.top + window.scrollY - 300 - 5;
+            // Calculate available space below and above the cell
+            const spaceBelow = window.innerHeight - rect.bottom;
+            const spaceAbove = rect.top;
+
+            // Decide position based on available space
+            if (spaceBelow >= modalHeight + 10) {
+                // Enough space below - position below the cell
+                modalTop = rect.bottom + 5;
+            } else if (spaceAbove >= modalHeight + 10) {
+                // Not enough space below but enough above - position above the cell
+                modalTop = rect.top - modalHeight - 5;
+            } else {
+                // Not enough space either way - position where there's more space
+                if (spaceAbove > spaceBelow) {
+                    modalTop = rect.top - modalHeight - 5;
+                    // Make sure it doesn't go above viewport
+                    if (modalTop < 10) {
+                        modalTop = 10;
+                    }
+                } else {
+                    modalTop = rect.bottom + 5;
+                    // Make sure it doesn't go below viewport
+                    if (modalTop + modalHeight > window.innerHeight - 10) {
+                        modalTop = window.innerHeight - modalHeight - 10;
+                    }
+                }
             }
 
+            // Handle horizontal positioning
+            modalLeft = rect.left;
+
+            // Check if modal goes beyond right edge
             if (modalLeft + modalRect.width > window.innerWidth) {
                 modalLeft = window.innerWidth - modalRect.width - 10;
             }
 
-            if (modalLeft < 0) {
+            // Check if modal goes beyond left edge
+            if (modalLeft < 10) {
                 modalLeft = 10;
-            }
-
-            if (modalTop < 0) {
-                modalTop = 10;
             }
 
             modal.style.left = modalLeft + 'px';
@@ -1446,7 +1595,7 @@
                     foundOption.classList.add('keyboard-focused');
                     foundOption.style.backgroundColor = accentColor;
                     foundOption.style.color = 'white';
-                    foundOption.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    foundOption.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             }
         }
@@ -1530,6 +1679,14 @@
         }
 
         function resetApp() {
+            if (config.timer > 0 && timerInterval) {
+                if (confirm('Reset will restart the timer. Continue?')) {
+                    clearInterval(timerInterval);
+                    startTimer(config.timer);
+                } else {
+                    return;
+                }
+            }
             buildChordBank();
             buildTable();
             updateProgress();
