@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Major Scales Trainer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Theme variables */
+        :root[data-theme="light-minimal"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --bg-tertiary: #e8e8e8;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-color: #cccccc;
+            --hover-bg: #f0f0f0;
+            --correct: #4caf50;
+            --incorrect: #f44336;
+            --accent: #5c6bc0;
+            --button-bg: #5c6bc0;
+            --button-hover: #3f51b5;
+            --header-bg: #e0e0e0;
+            --primary-header: #dc3545;
+            --primary-cell: #ffe5e8;
+            --secondary-header: #0d6efd;
+            --secondary-cell: #e7f1ff;
+            --diminished-header: #198754;
+            --diminished-cell: #e8f5e9;
+        }
+
+        :root[data-theme="dark-minimal"] {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --bg-tertiary: #3a3a3a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --border-color: #444444;
+            --hover-bg: #3a3a3a;
+            --correct: #4caf50;
+            --incorrect: #f44336;
+            --accent: #7986cb;
+            --button-bg: #5c6bc0;
+            --button-hover: #7986cb;
+            --header-bg: #2a2a2a;
+            --primary-header: #dc3545;
+            --primary-cell: #3d1f23;
+            --secondary-header: #0d6efd;
+            --secondary-cell: #1a2a3d;
+            --diminished-header: #198754;
+            --diminished-cell: #1f3d2a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        /* Start screen */
+        #startScreen {
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--bg-secondary);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .config-section {
+            margin-bottom: 30px;
+        }
+
+        .features-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .features-section h3 {
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            font-size: 1.2em;
+        }
+
+        .features-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .features-list li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        .features-list li::before {
+            content: "•";
+            position: absolute;
+            left: 8px;
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .features-list strong {
+            color: var(--accent);
+        }
+
+        .config-section h3 {
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            font-size: 1.2em;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .radio-option:hover {
+            background: var(--hover-bg);
+            border-color: var(--accent);
+        }
+
+        .radio-option input[type="radio"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .start-button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: white;
+            background: var(--button-bg);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .start-button:hover {
+            background: var(--button-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Main screen */
+        #mainScreen {
+            display: none;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 1em;
+            color: white;
+            background: var(--button-bg);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: var(--button-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Chord bank */
+        .chord-bank {
+            flex: 0 0 280px;
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            max-height: none;
+            overflow-y: visible;
+        }
+
+        .chord-bank h3 {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .chords-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chord-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .chord-group-label {
+            font-weight: bold;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            margin-bottom: 4px;
+            padding-left: 4px;
+        }
+
+        .chord-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .chord {
+            padding: 8px 12px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: move;
+            user-select: none;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 0.9em;
+            text-align: center;
+            flex: 0 0 auto;
+        }
+
+        .chord:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .chord.dragging {
+            opacity: 0.5;
+        }
+
+        /* Scale checkboxes */
+        .scale-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .scale-checkbox:hover {
+            background: var(--hover-bg);
+        }
+
+        .scale-checkbox input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .scale-checkbox label {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        #scaleCheckboxes {
+            display: none;
+            margin-top: 10px;
+            padding: 15px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        #scaleCheckboxes > div {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        #checkBtn {
+            display: none;
+        }
+
+        /* Table */
+        .table-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            position: relative;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            overflow: hidden;
+            table-layout: fixed;
+        }
+
+        th, td {
+            padding: 12px 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            font-size: 0.9em;
+            width: auto;
+            min-width: 80px;
+        }
+
+        th {
+            background: var(--header-bg);
+            font-weight: bold;
+        }
+
+        .header-row-1 th {
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        .header-row-2 th {
+            font-size: 0.85em;
+            font-style: italic;
+        }
+
+        .header-row-3 th {
+            font-size: 0.85em;
+        }
+
+        .header-row-4 th {
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        /* Column colors by chord groups */
+        .col-primary {
+            background: var(--primary-header);
+            color: white;
+        }
+
+        .cell-primary {
+            background: var(--primary-cell) !important;
+        }
+
+        .col-secondary {
+            background: var(--secondary-header);
+            color: white;
+        }
+
+        .cell-secondary {
+            background: var(--secondary-cell) !important;
+        }
+
+        .col-diminished {
+            background: var(--diminished-header);
+            color: white;
+        }
+
+        .cell-diminished {
+            background: var(--diminished-cell) !important;
+        }
+
+        .scale-cell {
+            font-weight: bold;
+            background: var(--bg-tertiary);
+            position: relative;
+        }
+
+        .scale-cell .clear-row-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 12px;
+            display: none;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            padding: 0;
+        }
+
+        .scale-cell.has-chords .clear-row-btn {
+            display: block;
+        }
+
+        .scale-cell .clear-row-btn:hover {
+            background: rgba(211, 47, 47, 1);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .info-cell {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* Drop zone */
+        .drop-zone {
+            min-height: 50px;
+            background: var(--bg-primary);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .drop-zone:hover:not(.filled) {
+            background: var(--hover-bg);
+            border-color: var(--accent);
+        }
+
+        .drop-zone.filled {
+            cursor: default;
+        }
+
+        .drop-zone.drag-over {
+            background: var(--hover-bg);
+            border-color: var(--accent);
+            border-style: solid;
+        }
+
+        .drop-zone.filled {
+            background: var(--bg-tertiary);
+            border-style: solid;
+        }
+
+        .drop-zone.correct {
+            background: var(--correct);
+            color: white;
+            border-color: var(--correct);
+        }
+
+        .drop-zone.incorrect {
+            background: var(--incorrect);
+            color: white;
+            border-color: var(--incorrect);
+        }
+
+        .drop-zone .remove-btn {
+            position: absolute;
+            top: 1px;
+            right: 2px;
+            width: 20px;
+            height: 20px;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 12px;
+            display: none;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            padding: 0;
+        }
+
+        .drop-zone.filled .remove-btn {
+            display: block;
+        }
+
+        .drop-zone .remove-btn:hover {
+            background: rgba(211, 47, 47, 1);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .drop-zone .chord-text {
+            padding-right: 20px;
+        }
+
+        /* Chord selection modal */
+        #chordModal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            background: var(--bg-primary);
+            border: 2px solid #000000;
+            border-radius: 8px;
+            padding: 8px;
+            padding-top: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+            max-height: 300px;
+            height: 300px;
+            overflow-y: scroll;
+        }
+
+        #chordModal.active {
+            display: block !important;
+            visibility: visible !important;
+        }
+
+        #chordModal .close-modal-btn {
+            position: sticky;
+            top: 0;
+            float: right;
+            width: 28px;
+            height: 28px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 300;
+            z-index: 10001;
+            padding: 0;
+            margin-bottom: 8px;
+        }
+
+        #chordModal .close-modal-btn:hover {
+            background: var(--incorrect);
+            color: white;
+            border-color: var(--incorrect);
+        }
+
+        .modal-option {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.95em;
+            margin-bottom: 2px;
+            border: 1px solid transparent;
+            user-select: none;
+        }
+
+        .progress {
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            #startScreen {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .main-content {
+                flex-direction: column;
+            }
+
+            .chord-bank {
+                flex: 1;
+                width: 100%;
+                max-height: 300px;
+            }
+
+            .table-wrapper {
+                width: 100%;
+            }
+
+            th, td {
+                padding: 8px 4px;
+                font-size: 0.75em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Start screen -->
+        <div id="startScreen">
+            <h1>🎵 Major Scales Trainer</h1>
+
+            <div class="config-section">
+                <h3>Exercise Mode</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="mode" value="all" checked>
+                        <span>All scales (15 scales)</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="mode" value="custom">
+                        <span>Select scales to practice</span>
+                    </label>
+                    <div id="scaleCheckboxes">
+                        <div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3>Difficulty Level</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="difficulty" value="all" checked>
+                        <span>All chords</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="difficulty" value="scale">
+                        <span>Only chords from selected scales</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3>Validation Mode</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="validation" value="instant" checked>
+                        <span>Instant validation</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="validation" value="manual">
+                        <span>Manual validation</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3>Theme</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="theme" value="light-minimal" checked>
+                        <span>Light Minimal</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="theme" value="dark-minimal">
+                        <span>Dark Minimal</span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="start-button" onclick="startApp()">START</button>
+
+            <div class="features-section">
+                <h3>✨ Features</h3>
+                <ul class="features-list">
+                    <li><strong>15 Major Scales</strong> - Practice all major scales from C to Cb</li>
+                    <li><strong>Drag & Drop</strong> - Drag chords from the bank or click cells to select</li>
+                    <li><strong>Custom Practice</strong> - Choose specific scales or practice all at once</li>
+                    <li><strong>Smart Validation</strong> - Instant feedback or manual checking</li>
+                    <li><strong>Color-Coded Columns</strong> - I/IV/V (red), II/III/VI (blue), VII (green)</li>
+                    <li><strong>Quick Reset</strong> - Clear individual cells, entire scales, or all at once</li>
+                    <li><strong>Two Themes</strong> - Light and dark minimal modes</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main screen -->
+        <div id="mainScreen">
+            <h1>🎵 Major Scales Trainer</h1>
+
+            <div class="controls">
+                <button class="btn" onclick="showStartScreen()">← Menu</button>
+                <button class="btn" onclick="resetApp()">🔄 Reset</button>
+                <button class="btn" id="checkBtn" onclick="checkAllAnswers()">✓ Check</button>
+            </div>
+
+            <div class="main-content">
+                <div class="chord-bank">
+                    <h3>Chord Bank</h3>
+                    <div class="chords-container" id="chordBank"></div>
+                </div>
+
+                <div class="table-wrapper">
+                    <div class="table-container">
+                        <table id="scalesTable"></table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="progress" id="progress"></div>
+        </div>
+    </div>
+
+    <!-- Chord selection modal -->
+    <div id="chordModal"></div>
+
+    <script>
+        // Scale data with chords (triads) and accidentals
+        const scales = {
+            'C': {chords: ['C', 'Dm', 'Em', 'F', 'G', 'Am', 'Bdim'], accidentals: '0'},
+            'G': {chords: ['G', 'Am', 'Bm', 'C', 'D', 'Em', 'F#dim'], accidentals: '1#'},
+            'D': {chords: ['D', 'Em', 'F#m', 'G', 'A', 'Bm', 'C#dim'], accidentals: '2#'},
+            'A': {chords: ['A', 'Bm', 'C#m', 'D', 'E', 'F#m', 'G#dim'], accidentals: '3#'},
+            'E': {chords: ['E', 'F#m', 'G#m', 'A', 'B', 'C#m', 'D#dim'], accidentals: '4#'},
+            'B': {chords: ['B', 'C#m', 'D#m', 'E', 'F#', 'G#m', 'A#dim'], accidentals: '5#'},
+            'F#': {chords: ['F#', 'G#m', 'A#m', 'B', 'C#', 'D#m', 'E#dim'], accidentals: '6#'},
+            'C#': {chords: ['C#', 'D#m', 'E#m', 'F#', 'G#', 'A#m', 'B#dim'], accidentals: '7#'},
+            'F': {chords: ['F', 'Gm', 'Am', 'Bb', 'C', 'Dm', 'Edim'], accidentals: '1b'},
+            'Bb': {chords: ['Bb', 'Cm', 'Dm', 'Eb', 'F', 'Gm', 'Adim'], accidentals: '2b'},
+            'Eb': {chords: ['Eb', 'Fm', 'Gm', 'Ab', 'Bb', 'Cm', 'Ddim'], accidentals: '3b'},
+            'Ab': {chords: ['Ab', 'Bbm', 'Cm', 'Db', 'Eb', 'Fm', 'Gdim'], accidentals: '4b'},
+            'Db': {chords: ['Db', 'Ebm', 'Fm', 'Gb', 'Ab', 'Bbm', 'Cdim'], accidentals: '5b'},
+            'Gb': {chords: ['Gb', 'Abm', 'Bbm', 'Cb', 'Db', 'Ebm', 'Fdim'], accidentals: '6b'},
+            'Cb': {chords: ['Cb', 'Dbm', 'Ebm', 'Fb', 'Gb', 'Abm', 'Bdim'], accidentals: '7b'}
+        };
+
+        // Table header rows
+        const headerRows = [
+            ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'Num #/b'],
+            ['Tonic', 'Supertonic', 'Mediant', 'Subdominant', 'Dominant', 'Submediant', 'Leading Tone', ''],
+            ['Unison', 'T', 'T', 'S', 'T', 'T', 'T', 'Octave S'],
+            ['Major', 'Minor', 'Minor', 'Major', 'Major', 'Minor', 'Dim', '']
+        ];
+
+        // Application state
+        let config = {
+            mode: 'all',
+            selectedScales: [],
+            difficulty: 'all',
+            validation: 'instant',
+            theme: 'light-minimal'
+        };
+
+        let userAnswers = {};
+        let draggedChord = null;
+        let currentDropZone = null;
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            populateScaleCheckboxes();
+            setupStartScreenListeners();
+
+            // Apply cached state after page load/refresh
+
+            // 1. Exercise Mode - show checkboxes if custom is selected
+            const modeRadio = document.querySelector('input[name="mode"]:checked');
+            if (modeRadio && modeRadio.value === 'custom') {
+                document.getElementById('scaleCheckboxes').style.display = 'block';
+            }
+
+            // 2. Theme - apply cached theme
+            const themeRadio = document.querySelector('input[name="theme"]:checked');
+            if (themeRadio) {
+                document.documentElement.setAttribute('data-theme', themeRadio.value);
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light-minimal');
+            }
+
+            // Note: Difficulty Level and Validation Mode don't need initialization
+            // They are only used when clicking START button
+        });
+
+        function populateScaleCheckboxes() {
+            const container = document.querySelector('#scaleCheckboxes > div');
+            Object.keys(scales).forEach(scale => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'scale-checkbox';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = 'scale-' + scale;
+                checkbox.value = scale;
+
+                const label = document.createElement('label');
+                label.htmlFor = 'scale-' + scale;
+                label.textContent = scale;
+
+                wrapper.appendChild(checkbox);
+                wrapper.appendChild(label);
+                wrapper.addEventListener('click', (e) => {
+                    if (e.target !== checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                    }
+                });
+
+                container.appendChild(wrapper);
+            });
+        }
+
+        function setupStartScreenListeners() {
+            // Mode selection
+            document.querySelectorAll('input[name="mode"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const checkboxContainer = document.getElementById('scaleCheckboxes');
+                    checkboxContainer.style.display = e.target.value === 'custom' ? 'block' : 'none';
+                });
+            });
+
+            // Theme selection
+            document.querySelectorAll('input[name="theme"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    document.documentElement.setAttribute('data-theme', e.target.value);
+                });
+            });
+        }
+
+        function startApp() {
+            // Collect configuration
+            config.mode = document.querySelector('input[name="mode"]:checked').value;
+
+            // Collect selected scales
+            if (config.mode === 'custom') {
+                const checkboxes = document.querySelectorAll('#scaleCheckboxes input[type="checkbox"]:checked');
+                config.selectedScales = Array.from(checkboxes).map(cb => cb.value);
+
+                if (config.selectedScales.length === 0) {
+                    alert('Please select at least one scale!');
+                    return;
+                }
+            } else {
+                config.selectedScales = Object.keys(scales);
+            }
+
+            config.difficulty = document.querySelector('input[name="difficulty"]:checked').value;
+            config.validation = document.querySelector('input[name="validation"]:checked').value;
+            config.theme = document.querySelector('input[name="theme"]:checked').value;
+
+            // Set theme
+            document.documentElement.setAttribute('data-theme', config.theme);
+
+            // Show check button only if manual validation
+            const checkBtn = document.getElementById('checkBtn');
+            if (config.validation === 'manual') {
+                checkBtn.style.display = 'inline-block';
+            } else {
+                checkBtn.style.display = 'none';
+            }
+
+            // Switch to main screen
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('mainScreen').style.display = 'block';
+
+            // Build application
+            buildChordBank();
+            buildTable();
+            updateProgress();
+        }
+
+        function showStartScreen() {
+            document.getElementById('mainScreen').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'block';
+            resetApp();
+        }
+
+        function buildChordBank() {
+            const bank = document.getElementById('chordBank');
+            bank.innerHTML = '';
+
+            let chords = [];
+
+            if (config.difficulty === 'all') {
+                // All chords
+                Object.values(scales).forEach(scale => {
+                    chords = chords.concat(scale.chords);
+                });
+                chords = [...new Set(chords)];
+            } else {
+                // Only chords from selected scales
+                config.selectedScales.forEach(scaleName => {
+                    chords = chords.concat(scales[scaleName].chords);
+                });
+                chords = [...new Set(chords)];
+            }
+
+            // Group chords by base note (A, B, C, D, E, F, G)
+            const chordGroups = {
+                'A': [], 'B': [], 'C': [], 'D': [], 'E': [], 'F': [], 'G': []
+            };
+
+            chords.forEach(chord => {
+                const baseNote = chord.charAt(0);
+                if (chordGroups[baseNote]) {
+                    chordGroups[baseNote].push(chord);
+                }
+            });
+
+            // Create groups with labels
+            ['A', 'B', 'C', 'D', 'E', 'F', 'G'].forEach(note => {
+                if (chordGroups[note].length > 0) {
+                    chordGroups[note].sort();
+
+                    const groupDiv = document.createElement('div');
+                    groupDiv.className = 'chord-group';
+
+                    const label = document.createElement('div');
+                    label.className = 'chord-group-label';
+                    label.textContent = note + ':';
+                    groupDiv.appendChild(label);
+
+                    const rowDiv = document.createElement('div');
+                    rowDiv.className = 'chord-row';
+
+                    chordGroups[note].forEach(chord => {
+                        const chordEl = document.createElement('div');
+                        chordEl.className = 'chord';
+                        chordEl.textContent = chord;
+                        chordEl.draggable = true;
+                        chordEl.dataset.chord = chord;
+
+                        chordEl.addEventListener('dragstart', handleDragStart);
+                        chordEl.addEventListener('dragend', handleDragEnd);
+
+                        rowDiv.appendChild(chordEl);
+                    });
+
+                    groupDiv.appendChild(rowDiv);
+                    bank.appendChild(groupDiv);
+                }
+            });
+        }
+
+        function buildTable() {
+            const table = document.getElementById('scalesTable');
+            table.innerHTML = '';
+
+            const thead = document.createElement('thead');
+
+            // 4 header rows
+            headerRows.forEach((row, index) => {
+                const headerRow = document.createElement('tr');
+                headerRow.className = 'header-row-' + (index + 1);
+
+                const scaleHeader = document.createElement('th');
+                scaleHeader.textContent = index === 0 ? 'Scale' : '';
+                scaleHeader.rowSpan = index === 0 ? 4 : 1;
+                if (index === 0) {
+                    headerRow.appendChild(scaleHeader);
+                }
+
+                row.forEach((header, i) => {
+                    const th = document.createElement('th');
+                    th.textContent = header;
+
+                    // Add degree class for row 1
+                    if (index === 0 && i < 7) {
+                        th.className = 'degree-' + (i + 1);
+
+                        // Add color classes by chord groups
+                        if (i === 0 || i === 3 || i === 4) { // I, IV, V
+                            th.classList.add('col-primary');
+                        } else if (i === 1 || i === 2 || i === 5) { // II, III, VI
+                            th.classList.add('col-secondary');
+                        } else if (i === 6) { // VII
+                            th.classList.add('col-diminished');
+                        }
+                    }
+
+                    headerRow.appendChild(th);
+                });
+
+                thead.appendChild(headerRow);
+            });
+
+            table.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+
+            const scalesToShow = config.selectedScales;
+
+            scalesToShow.forEach(scale => {
+                const row = document.createElement('tr');
+                row.dataset.scale = scale;
+
+                const scaleCell = document.createElement('td');
+                scaleCell.className = 'scale-cell';
+
+                // Add scale name
+                const scaleName = document.createElement('span');
+                scaleName.textContent = scale;
+                scaleCell.appendChild(scaleName);
+
+                // Add clear row button
+                const clearRowBtn = document.createElement('button');
+                clearRowBtn.className = 'clear-row-btn';
+                clearRowBtn.textContent = '×';
+                clearRowBtn.title = 'Clear all chords in this scale';
+                clearRowBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    clearScaleRow(row);
+                };
+                scaleCell.appendChild(clearRowBtn);
+
+                row.appendChild(scaleCell);
+
+                // 7 cells with chords (drop zones)
+                for (let degree = 0; degree < 7; degree++) {
+                    const cell = document.createElement('td');
+
+                    // Add color class to cell
+                    if (degree === 0 || degree === 3 || degree === 4) { // I, IV, V
+                        cell.classList.add('cell-primary');
+                    } else if (degree === 1 || degree === 2 || degree === 5) { // II, III, VI
+                        cell.classList.add('cell-secondary');
+                    } else if (degree === 6) { // VII
+                        cell.classList.add('cell-diminished');
+                    }
+
+                    const dropZone = document.createElement('div');
+                    dropZone.className = 'drop-zone';
+                    dropZone.dataset.scale = scale;
+                    dropZone.dataset.degree = degree;
+
+                    // Add remove button
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'remove-btn';
+                    removeBtn.textContent = '×';
+                    removeBtn.onclick = function(e) {
+                        e.stopPropagation();
+                        removeChordFromCell(dropZone);
+                    };
+
+                    dropZone.appendChild(removeBtn);
+
+                    dropZone.addEventListener('dragover', handleDragOver);
+                    dropZone.addEventListener('dragleave', handleDragLeave);
+                    dropZone.addEventListener('drop', handleDrop);
+
+                    // Add click handler for dropdown
+                    dropZone.addEventListener('click', function(e) {
+                        if (!this.classList.contains('filled')) {
+                            showChordDropdown(this);
+                        }
+                    });
+
+                    cell.appendChild(dropZone);
+                    row.appendChild(cell);
+                }
+
+                // 8th column - Num #/b (informational)
+                const infoCell = document.createElement('td');
+                infoCell.textContent = scales[scale].accidentals;
+                infoCell.className = 'info-cell';
+                row.appendChild(infoCell);
+
+                tbody.appendChild(row);
+            });
+
+            table.appendChild(tbody);
+
+            userAnswers = {};
+        }
+
+        // Drag and drop handlers
+        function handleDragStart(e) {
+            draggedChord = e.target.dataset.chord;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', e.target.innerHTML);
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            e.target.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.target.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.target.classList.remove('drag-over');
+
+            let dropZone = e.target;
+
+            // If clicked on remove button, find parent drop-zone
+            if (dropZone.classList.contains('remove-btn')) {
+                dropZone = dropZone.parentElement;
+            }
+
+            const scale = dropZone.dataset.scale;
+            const degree = parseInt(dropZone.dataset.degree);
+
+            // Remove previous chord if exists
+            const existingChord = dropZone.querySelector('.chord-text');
+            if (existingChord) {
+                existingChord.remove();
+            }
+
+            // Add new chord
+            const chordText = document.createElement('span');
+            chordText.className = 'chord-text';
+            chordText.textContent = draggedChord;
+            dropZone.appendChild(chordText);
+
+            dropZone.classList.add('filled');
+            dropZone.classList.remove('correct', 'incorrect');
+
+            // Save answer (don't remove chord from bank - it can be reused)
+            const key = scale + '-' + degree;
+            userAnswers[key] = draggedChord;
+
+            // Validate instantly if instant mode
+            if (config.validation === 'instant') {
+                validateCell(dropZone, scale, degree);
+            }
+
+            updateProgress();
+            updateScaleClearButtons();
+        }
+
+        function removeChordFromBank(chord) {
+            const chords = document.querySelectorAll('#chordBank .chord');
+            chords.forEach(el => {
+                if (el.dataset.chord === chord && !el.classList.contains('used')) {
+                    el.classList.add('used');
+                    el.style.display = 'none';
+                    return;
+                }
+            });
+        }
+
+        function returnChordToBank(chord) {
+            const chords = document.querySelectorAll('#chordBank .chord');
+            chords.forEach(el => {
+                if (el.dataset.chord === chord && el.classList.contains('used')) {
+                    el.classList.remove('used');
+                    el.style.display = 'inline-block';
+                    return;
+                }
+            });
+        }
+
+        function removeChordFromCell(dropZone) {
+            const chordText = dropZone.querySelector('.chord-text');
+            if (!chordText) return;
+
+            const chord = chordText.textContent.replace(' ✓', '').replace(' ✗', '');
+            const scale = dropZone.dataset.scale;
+            const degree = parseInt(dropZone.dataset.degree);
+            const key = scale + '-' + degree;
+
+            // Remove from answers
+            delete userAnswers[key];
+
+            // Clear cell (chord stays in bank - no need to return)
+            chordText.remove();
+            dropZone.classList.remove('filled', 'correct', 'incorrect');
+
+            updateProgress();
+            updateScaleClearButtons();
+        }
+
+        function clearScaleRow(row) {
+            const scale = row.dataset.scale;
+
+            // Find all drop zones in this row
+            const dropZones = row.querySelectorAll('.drop-zone');
+
+            dropZones.forEach(dropZone => {
+                const chordText = dropZone.querySelector('.chord-text');
+                if (chordText) {
+                    const degree = parseInt(dropZone.dataset.degree);
+                    const key = scale + '-' + degree;
+
+                    // Remove from answers
+                    delete userAnswers[key];
+
+                    // Clear cell
+                    chordText.remove();
+                    dropZone.classList.remove('filled', 'correct', 'incorrect');
+                }
+            });
+
+            updateProgress();
+            updateScaleClearButtons();
+        }
+
+        function updateScaleClearButtons() {
+            // Update visibility of clear buttons for each scale row
+            const rows = document.querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                const scaleCell = row.querySelector('.scale-cell');
+                if (!scaleCell) return;
+
+                // Check if any drop zone in this row is filled
+                const dropZones = row.querySelectorAll('.drop-zone');
+                const hasAnyChord = Array.from(dropZones).some(zone =>
+                    zone.querySelector('.chord-text')
+                );
+
+                // Toggle has-chords class
+                if (hasAnyChord) {
+                    scaleCell.classList.add('has-chords');
+                } else {
+                    scaleCell.classList.remove('has-chords');
+                }
+            });
+        }
+
+        // Chord selection modal
+        function showChordDropdown(dropZone) {
+            // Collect available chords
+            let availableChords = [];
+            const chordElements = document.querySelectorAll('#chordBank .chord:not(.used)');
+            chordElements.forEach(el => {
+                availableChords.push(el.dataset.chord);
+            });
+
+            if (availableChords.length === 0) {
+                return; // No available chords
+            }
+
+            availableChords.sort();
+
+            // Save current drop zone
+            currentDropZone = dropZone;
+
+            // Get cell position
+            const rect = dropZone.getBoundingClientRect();
+
+            // Show modal
+            const modal = document.getElementById('chordModal');
+
+            modal.innerHTML = '';
+
+            // Get colors from CSS variables
+            const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#5c6bc0';
+            const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-primary').trim() || '#ffffff';
+            const bgTertiary = getComputedStyle(document.documentElement).getPropertyValue('--bg-tertiary').trim();
+            const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim();
+
+            // Add close button
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'close-modal-btn';
+            closeBtn.textContent = '×';
+            closeBtn.style.position = 'sticky';
+            closeBtn.style.top = '0';
+            closeBtn.style.right = '8px';
+            closeBtn.style.float = 'right';
+            closeBtn.style.width = '28px';
+            closeBtn.style.height = '28px';
+            closeBtn.style.border = '1px solid var(--border-color)';
+            closeBtn.style.borderRadius = '6px';
+            closeBtn.style.cursor = 'pointer';
+            closeBtn.style.fontSize = '20px';
+            closeBtn.style.fontWeight = '300';
+            closeBtn.style.padding = '0';
+            closeBtn.style.display = 'flex';
+            closeBtn.style.alignItems = 'center';
+            closeBtn.style.justifyContent = 'center';
+            closeBtn.style.zIndex = '10001';
+            closeBtn.style.marginBottom = '8px';
+            closeBtn.style.marginLeft = 'auto';
+            closeBtn.style.backgroundColor = bgTertiary;
+            closeBtn.style.color = textColor;
+
+            closeBtn.onmouseenter = function() {
+                this.style.backgroundColor = '#f44336';
+                this.style.color = 'white';
+                this.style.borderColor = '#f44336';
+            };
+
+            closeBtn.onmouseleave = function() {
+                this.style.backgroundColor = bgTertiary;
+                this.style.color = textColor;
+                this.style.borderColor = '';
+            };
+
+            closeBtn.onclick = function(e) {
+                e.stopPropagation();
+                closeChordModal();
+            };
+            modal.appendChild(closeBtn);
+
+            // Add chord options
+            availableChords.forEach(chord => {
+                const option = document.createElement('div');
+                option.className = 'modal-option';
+                option.textContent = chord;
+                option.dataset.chord = chord;
+                option.style.cursor = 'pointer';
+                option.style.padding = '8px 12px';
+                option.style.borderRadius = '4px';
+                option.style.marginBottom = '2px';
+                option.style.border = '1px solid transparent';
+
+                // Add hover effect
+                option.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = accentColor;
+                    this.style.color = 'white';
+                });
+
+                option.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = 'transparent';
+                    this.style.color = '';
+                });
+
+                option.onclick = function(e) {
+                    e.stopPropagation();
+                    const chordToAdd = this.dataset.chord;
+                    const zone = currentDropZone;
+                    closeChordModal();
+                    if (zone) {
+                        addChordToCell(zone, chordToAdd);
+                    }
+                };
+                modal.appendChild(option);
+            });
+
+            // Default position under cell
+            let modalTop = rect.bottom + window.scrollY + 5;
+            let modalLeft = rect.left + window.scrollX;
+
+            // Set position and dimensions immediately
+            modal.style.position = 'fixed';
+            modal.style.zIndex = '10000';
+            modal.style.height = '300px';
+            modal.style.maxHeight = '300px';
+            modal.style.overflowY = 'scroll';
+
+            // Temporarily show modal to measure width
+            modal.style.display = 'block';
+            modal.style.visibility = 'hidden';
+            modal.style.left = '0px';
+            modal.style.top = '0px';
+
+            const modalRect = modal.getBoundingClientRect();
+
+            // Check if modal goes beyond bottom edge (300px height)
+            if (modalTop + 300 > window.innerHeight) {
+                modalTop = rect.top + window.scrollY - 300 - 5;
+            }
+
+            // Check if modal goes beyond right edge
+            if (modalLeft + modalRect.width > window.innerWidth) {
+                modalLeft = window.innerWidth - modalRect.width - 10;
+            }
+
+            // Check if modal goes beyond left edge
+            if (modalLeft < 0) {
+                modalLeft = 10;
+            }
+
+            // Check if modal goes beyond top edge
+            if (modalTop < 0) {
+                modalTop = 10;
+            }
+
+            // Set final position with full inline styles
+            modal.style.left = modalLeft + 'px';
+            modal.style.top = modalTop + 'px';
+            modal.style.visibility = 'visible';
+            modal.style.display = 'block';
+            modal.style.backgroundColor = bgColor;
+            modal.style.border = '2px solid #000000';
+            modal.style.padding = '6px';
+            modal.style.borderRadius = '8px';
+            modal.style.width = '200px';
+
+            modal.classList.add('active');
+
+            // Prevent closing when clicking inside modal
+            modal.onclick = function(e) {
+                e.stopPropagation();
+            };
+        }
+
+        function closeChordModal() {
+            const modal = document.getElementById('chordModal');
+            modal.classList.remove('active');
+            modal.style.display = 'none';
+        }
+
+        function addChordToCell(dropZone, chord) {
+            const scale = dropZone.dataset.scale;
+            const degree = parseInt(dropZone.dataset.degree);
+
+            // Clear cell (keep only removeBtn if it was)
+            const existingText = dropZone.querySelector('.chord-text');
+            if (existingText) {
+                existingText.remove();
+            }
+
+            // Add chord text
+            const chordText = document.createElement('span');
+            chordText.className = 'chord-text';
+            chordText.textContent = chord;
+            dropZone.appendChild(chordText);
+
+            dropZone.classList.add('filled');
+            dropZone.classList.remove('correct', 'incorrect');
+
+            // Save answer (chord stays in bank - can be reused)
+            const key = scale + '-' + degree;
+            userAnswers[key] = chord;
+
+            // Validate instantly if instant mode
+            if (config.validation === 'instant') {
+                validateCell(dropZone, scale, degree);
+            }
+
+            updateProgress();
+
+            // Clear currentDropZone
+            currentDropZone = null;
+
+            updateScaleClearButtons();
+        }
+
+        function validateCell(dropZone, scale, degree) {
+            const chordText = dropZone.querySelector('.chord-text');
+            if (!chordText) return;
+
+            const userChord = chordText.textContent.replace(' ✓', '').replace(' ✗', '');
+            const correctChord = scales[scale].chords[degree];
+
+            if (userChord === correctChord) {
+                dropZone.classList.add('correct');
+                dropZone.classList.remove('incorrect');
+            } else {
+                dropZone.classList.add('incorrect');
+                dropZone.classList.remove('correct');
+            }
+        }
+
+        function checkAllAnswers() {
+            const dropZones = document.querySelectorAll('.drop-zone');
+            dropZones.forEach(zone => {
+                const chordText = zone.querySelector('.chord-text');
+                if (chordText) {
+                    const scale = zone.dataset.scale;
+                    const degree = parseInt(zone.dataset.degree);
+                    validateCell(zone, scale, degree);
+                }
+            });
+            updateProgress();
+        }
+
+        function resetApp() {
+            buildChordBank();
+            buildTable();
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const totalCells = config.selectedScales.length * 7;
+            const filled = Object.keys(userAnswers).length;
+
+            let correct = 0;
+            if (config.validation === 'instant' || document.querySelectorAll('.correct').length > 0) {
+                correct = document.querySelectorAll('.correct').length;
+            }
+
+            const progressEl = document.getElementById('progress');
+            progressEl.innerHTML = `Filled: ${filled}/${totalCells}`;
+
+            if (correct > 0) {
+                progressEl.innerHTML += ` | Correct: ${correct}/${filled}`;
+            }
+
+            if (filled === totalCells && correct === totalCells) {
+                progressEl.innerHTML += ` | 🎉 Congratulations! All answers are correct!`;
+            }
+        }
+    </script>
+</body>
+</html>
