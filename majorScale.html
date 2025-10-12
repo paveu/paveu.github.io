@@ -452,18 +452,23 @@
             font-weight: bold;
         }
 
-        .header-row-2 th {
+        .header-row-2 th,
+        .header-row-4 th {
             font-size: 0.85em;
-            font-style: italic;
+        }
+
+        .header-row-2 .mobile-short,
+        .header-row-3 .mobile-short,
+        .header-row-4 .mobile-short {
+            display: none;
+        }
+
+        th .mobile-short {
+            display: none;
         }
 
         .header-row-3 th {
             font-size: 0.85em;
-        }
-
-        .header-row-4 th {
-            font-size: 0.9em;
-            font-weight: 600;
         }
 
         /* Column colors by chord groups */
@@ -721,6 +726,11 @@
                 width: 100%;
             }
 
+            .timer-display, .progress {
+                width: 100%;
+                justify-content: center;
+            }
+
             .main-content {
                 flex-direction: column;
             }
@@ -728,16 +738,59 @@
             .chord-bank {
                 flex: 1;
                 width: 100%;
-                max-height: 300px;
+                max-height: 250px;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+
+            .chord-row {
+                flex-wrap: wrap;
+            }
+
+            .chord {
+                font-size: 0.85em;
+                padding: 6px 10px;
             }
 
             .table-wrapper {
                 width: 100%;
+                overflow-x: auto;
             }
 
             th, td {
                 padding: 8px 4px;
                 font-size: 0.75em;
+                min-width: 60px;
+            }
+
+            .back-to-home {
+                display: none;
+            }
+
+            th .full-text {
+                display: none;
+            }
+
+            th .mobile-short {
+                display: inline;
+            }
+
+            .header-row-2 .full-text,
+            .header-row-3 .full-text,
+            .header-row-4 {
+                display: none;
+            }
+
+            .header-row-2 .mobile-short,
+            .header-row-3 .mobile-short {
+                display: inline;
+            }
+
+            .header-row-2 th,
+            .header-row-3 th {
+                font-size: 0.7em;
+                font-style: normal;
+                font-weight: 600;
             }
         }
     </style>
@@ -899,8 +952,26 @@
         // Table header rows
         const headerRows = [
             ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'Num #/b'],
-            ['Tonic', 'Supertonic', 'Mediant', 'Subdominant', 'Dominant', 'Submediant', 'Leading Tone', ''],
-            ['Unison', 'T', 'T', 'S', 'T', 'T', 'T', 'Octave S'],
+            [
+                { full: 'Tonic', short: 'To' },
+                { full: 'Supertonic', short: 'Su' },
+                { full: 'Mediant', short: 'Me' },
+                { full: 'Subdominant', short: 'Sd' },
+                { full: 'Dominant', short: 'Do' },
+                { full: 'Submediant', short: 'Sm' },
+                { full: 'Leading Tone', short: 'LT' },
+                ''
+            ],
+            [
+                { full: 'Unison', short: 'U' },
+                'T',
+                'T',
+                'S',
+                'T',
+                'T',
+                'T',
+                { full: 'Octave S', short: 'OS' }
+            ],
             ['Major', 'Minor', 'Minor', 'Major', 'Major', 'Minor', 'Dim', '']
         ];
 
@@ -1161,15 +1232,41 @@
                 headerRow.className = 'header-row-' + (index + 1);
 
                 const scaleHeader = document.createElement('th');
-                scaleHeader.textContent = index === 0 ? 'Scale' : '';
                 scaleHeader.rowSpan = index === 0 ? 4 : 1;
                 if (index === 0) {
+                    const fullSpan = document.createElement('span');
+                    fullSpan.className = 'full-text';
+                    fullSpan.textContent = 'Scale';
+
+                    const shortSpan = document.createElement('span');
+                    shortSpan.className = 'mobile-short';
+                    shortSpan.textContent = 'S';
+
+                    scaleHeader.appendChild(fullSpan);
+                    scaleHeader.appendChild(shortSpan);
                     headerRow.appendChild(scaleHeader);
+                } else if (index > 0) {
+                    scaleHeader.textContent = '';
                 }
 
                 row.forEach((header, i) => {
                     const th = document.createElement('th');
-                    th.textContent = header;
+
+                    // Handle objects with full and short text
+                    if (typeof header === 'object' && header.full) {
+                        const fullSpan = document.createElement('span');
+                        fullSpan.className = 'full-text';
+                        fullSpan.textContent = header.full;
+
+                        const shortSpan = document.createElement('span');
+                        shortSpan.className = 'mobile-short';
+                        shortSpan.textContent = header.short;
+
+                        th.appendChild(fullSpan);
+                        th.appendChild(shortSpan);
+                    } else {
+                        th.textContent = header;
+                    }
 
                     if (index === 0 && i < 7) {
                         th.className = 'degree-' + (i + 1);
