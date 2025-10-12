@@ -1423,12 +1423,31 @@
             modal.onclick = function(e) {
                 e.stopPropagation();
             };
+
+            // Add click outside handler after a short delay
+            // This prevents the click that opened the modal from immediately closing it
+            setTimeout(() => {
+                document.addEventListener('click', handleClickOutsideModal, true);
+            }, 100);
+        }
+
+        function handleClickOutsideModal(e) {
+            const modal = document.getElementById('chordModal');
+
+            // Check if click is outside modal
+            if (!modal.contains(e.target) && modal.classList.contains('active')) {
+                closeChordModal();
+                document.removeEventListener('click', handleClickOutsideModal, true);
+            }
         }
 
         function closeChordModal() {
             const modal = document.getElementById('chordModal');
             modal.classList.remove('active');
             modal.style.display = 'none';
+
+            // Clean up event listener
+            document.removeEventListener('click', handleClickOutsideModal, true);
         }
 
         function addChordToCell(dropZone, chord) {

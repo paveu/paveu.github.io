@@ -53,6 +53,7 @@
                     <ul>
                         <li><a href="#about" class="nav-link active" aria-current="page">About</a></li>
                         <li><a href="#blog" class="nav-link">Blog</a></li>
+                        <li><a href="#music-theory" class="nav-link">Music Theory</a></li>
                         <li><a href="#contact" class="nav-link">Contact</a></li>
                     </ul>
                 </nav>
@@ -157,6 +158,23 @@
             <button class="back-button" onclick="showBlogList()" type="button" aria-label="Go back to blog list">← Back to Blog</button>
             <div id="post-content" role="article">
                 <div class="loading">Loading post...</div>
+            </div>
+        </section>
+
+        <section id="music-theory" class="section" aria-labelledby="music-theory-heading">
+            <div class="music-theory-header">
+                <h1 id="music-theory-heading">Music Theory Tools</h1>
+                <p>Interactive learning tools for music theory and practice</p>
+            </div>
+
+            <div class="music-theory-content">
+                <div class="tool-card">
+                    <h2>🎵 Major Scales Trainer</h2>
+                    <p>Practice and master major scales with this interactive trainer. Learn all 15 major scales, their chords, and relationships through drag-and-drop exercises.</p>
+                    <button onclick="window.open('majorScale.html', '_blank')" class="tool-button">
+                        Launch Major Scales Trainer →
+                    </button>
+                </div>
             </div>
         </section>
 

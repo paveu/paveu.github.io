@@ -950,3 +950,98 @@ nav a.active {
         border-left: 4px solid var(--primary);
     }
 }
+/* Add these styles to your existing styles.css file, after the .contact-btn-secondary styles */
+
+.music-theory-header {
+    text-align: center;
+    padding: 3rem 0;
+}
+
+.music-theory-header h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0 0 1rem 0;
+    color: var(--primary);
+}
+
+.music-theory-header p {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+}
+
+[data-theme="light"] .music-theory-header p {
+    color: var(--dark-muted);
+}
+
+.music-theory-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.tool-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 3rem;
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+}
+
+.tool-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary);
+}
+
+.tool-card h2 {
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    margin-top: 0;
+}
+
+.tool-card p {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+[data-theme="light"] .tool-card p {
+    color: var(--dark-muted);
+}
+
+.tool-button {
+    background: var(--primary);
+    color: var(--white);
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+
+.tool-button:hover {
+    background: var(--accent);
+    transform: translateX(5px);
+}
+
+@media (max-width: 768px) {
+    .music-theory-header h1 {
+        font-size: 2rem;
+    }
+
+    .tool-card {
+        padding: 2rem;
+    }
+
+    .tool-card h2 {
+        font-size: 1.5rem;
+    }
+}

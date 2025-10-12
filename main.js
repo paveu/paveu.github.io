@@ -236,7 +236,7 @@ function processHashChange(hash) {
             } else {
                 showSection('blog');
             }
-        } else if (hash === 'blog' || hash === 'about' || hash === 'contact') {
+        } else if (hash === 'blog' || hash === 'about' || hash === 'contact' || hash === 'music-theory') {
             showSection(hash);
         } else if (blogPosts.find(post => post.id === hash)) {
             showPost(hash);
