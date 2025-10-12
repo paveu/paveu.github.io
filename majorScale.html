@@ -2,8 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Major Scales Trainer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Major Scales Trainer - Interactive Music Theory Learning Tool | paveu.pl</title>
+
+    <meta name="description" content="Interactive Major Scales Trainer for learning all 15 major scales and their chords. Practice with drag-and-drop, keyboard navigation, instant validation, and color-coded columns. Perfect for music students and teachers.">
+    <meta name="keywords" content="Major Scales, Music Theory, Chord Trainer, Music Education, Interactive Learning, Piano Scales, Guitar Scales, Music Practice, Triads, Scale Degrees, Music Theory App, Learning Tool">
+    <meta name="author" content="Paweł Stępak">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="distribution" content="global">
+    <meta name="rating" content="general">
+    <meta name="generator" content="Custom HTML">
+    <meta name="copyright" content="Paweł Stępak">
+
+    <meta property="og:title" content="Major Scales Trainer - Interactive Music Theory Tool">
+    <meta property="og:description" content="Learn all 15 major scales with interactive drag-and-drop exercises. Features instant validation, keyboard navigation, and color-coded chord groups for effective music theory practice.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://paveu.pl/majorScale.html">
+    <meta property="og:site_name" content="paveu.pl - Music Theory Tools">
+    <meta property="og:locale" content="en_US">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Major Scales Trainer - Interactive Music Theory Tool">
+    <meta name="twitter:description" content="Learn all 15 major scales with interactive drag-and-drop exercises. Features instant validation, keyboard navigation, and color-coded chord groups.">
+
+    <link rel="canonical" href="https://paveu.pl/majorScale.html">
+    <meta name="theme-color" content="#5c6bc0">
+    <meta name="msapplication-TileColor" content="#5c6bc0">
+    <meta name="format-detection" content="telephone=no">
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
     <style>
         * {
             margin: 0;
@@ -1305,6 +1335,10 @@
                 option.style.border = '1px solid transparent';
 
                 option.addEventListener('mouseenter', function() {
+                    // Remove keyboard focus from all options when hovering
+                    const allOptions = modal.querySelectorAll('.modal-option');
+                    allOptions.forEach(opt => opt.classList.remove('keyboard-focused'));
+
                     this.style.backgroundColor = accentColor;
                     this.style.color = 'white';
                 });
@@ -1390,8 +1424,14 @@
                 e.preventDefault();
 
                 const options = modal.querySelectorAll('.modal-option');
+                const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#5c6bc0';
 
-                options.forEach(opt => opt.classList.remove('keyboard-focused'));
+                // Reset all options
+                options.forEach(opt => {
+                    opt.classList.remove('keyboard-focused');
+                    opt.style.backgroundColor = 'transparent';
+                    opt.style.color = '';
+                });
 
                 let foundOption = null;
                 for (let option of options) {
@@ -1404,6 +1444,8 @@
 
                 if (foundOption) {
                     foundOption.classList.add('keyboard-focused');
+                    foundOption.style.backgroundColor = accentColor;
+                    foundOption.style.color = 'white';
                     foundOption.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
             }
