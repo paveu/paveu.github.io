@@ -815,11 +815,11 @@
                 <h3>Theme</h3>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="theme" value="light-minimal" checked>
+                        <input type="radio" name="theme" value="light-minimal">
                         <span>Light Minimal</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="theme" value="dark-minimal">
+                        <input type="radio" name="theme" value="dark-minimal" checked>
                         <span>Dark Minimal</span>
                     </label>
                 </div>
@@ -910,7 +910,7 @@
             selectedScales: [],
             difficulty: 'all',
             validation: 'instant',
-            theme: 'light-minimal',
+            theme: 'dark-minimal',
             timer: 0
         };
 
@@ -934,7 +934,7 @@
             if (themeRadio) {
                 document.documentElement.setAttribute('data-theme', themeRadio.value);
             } else {
-                document.documentElement.setAttribute('data-theme', 'light-minimal');
+                document.documentElement.setAttribute('data-theme', 'dark-minimal');
             }
         });
 
