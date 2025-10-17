@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -57,6 +57,7 @@
             --fretboard-wood: #8B4513;
             --fret-wire: #C0C0C0;
             --string-color: #FFD700;
+            --string-highlight: #ff0000;
             --dot-color: #D3D3D3;
         }
 
@@ -76,6 +77,7 @@
             --fretboard-wood: #654321;
             --fret-wire: #A9A9A9;
             --string-color: #DAA520;
+            --string-highlight: #ff0000;
             --dot-color: #808080;
         }
 
@@ -198,6 +200,33 @@
         .radio-option input[type="checkbox"] {
             margin-right: 10px;
             cursor: pointer;
+        }
+
+        .fret-range-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .fret-range-input {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .fret-range-input label {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .fret-range-input input {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 1em;
         }
 
         .string-checkboxes {
@@ -392,6 +421,24 @@
             border-color: var(--incorrect);
         }
 
+        .highlight-circle {
+            animation: highlight-pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes highlight-pulse {
+            0%, 100% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 0.95;
+            }
+        }
+
+        .string-highlighted {
+            stroke: var(--string-highlight) !important;
+            stroke-width: 4 !important;
+        }
+
         .result-message {
             font-size: 1.3em;
             font-weight: bold;
@@ -515,29 +562,43 @@
         </div>
 
         <div id="startScreen">
-            <a href="https://paveu.pl" class="back-to-home" data-i18n="backToHome"></a>
+            <a href="https://paveu.pl/#music-theory" class="back-to-home" data-i18n="backToHome"></a>
 
             <h1 data-i18n="title"></h1>
 
             <div class="config-section">
-                <h3 data-i18n="numberOfFrets"></h3>
+                <h3 data-i18n="fretRange"></h3>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="frets" value="12" checked>
+                        <input type="radio" name="frets" value="preset-12" checked>
                         <span data-i18n="frets12"></span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="frets" value="15">
+                        <input type="radio" name="frets" value="preset-15">
                         <span data-i18n="frets15"></span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="frets" value="22">
+                        <input type="radio" name="frets" value="preset-22">
                         <span data-i18n="frets22"></span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="frets" value="24">
+                        <input type="radio" name="frets" value="preset-24">
                         <span data-i18n="frets24"></span>
                     </label>
+                    <label class="radio-option">
+                        <input type="radio" name="frets" value="custom">
+                        <span data-i18n="customRange"></span>
+                    </label>
+                </div>
+                <div class="fret-range-inputs" id="fretRangeInputs" style="display: none;">
+                    <div class="fret-range-input">
+                        <label for="fretFrom" data-i18n="fretFrom"></label>
+                        <input type="number" id="fretFrom" min="1" max="24" value="1">
+                    </div>
+                    <div class="fret-range-input">
+                        <label for="fretTo" data-i18n="fretTo"></label>
+                        <input type="number" id="fretTo" min="1" max="24" value="12">
+                    </div>
                 </div>
             </div>
 
@@ -545,16 +606,16 @@
                 <h3 data-i18n="noteNotation"></h3>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="notation" value="sharps" checked>
+                        <input type="radio" name="notation" value="both" checked>
+                        <span data-i18n="both"></span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="notation" value="sharps">
                         <span data-i18n="sharps"></span>
                     </label>
                     <label class="radio-option">
                         <input type="radio" name="notation" value="flats">
                         <span data-i18n="flats"></span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="notation" value="both">
-                        <span data-i18n="both"></span>
                     </label>
                 </div>
             </div>
@@ -622,7 +683,7 @@
         </div>
 
         <div id="mainScreen">
-            <a href="https://paveu.pl" class="back-to-home" data-i18n="backToHome"></a>
+            <a href="https://paveu.pl/#music-theory" class="back-to-home" data-i18n="backToHome"></a>
 
             <h1 data-i18n="title"></h1>
 
@@ -632,7 +693,7 @@
                 <div id="timerDisplay" class="timer-display" style="display: none;">
                     ⏱️ <span id="timerText">00:00</span>
                 </div>
-                <div class="progress" id="progress">Score: 0/0</div>
+                <div class="progress" id="progress">Wynik: 0/0</div>
             </div>
 
             <div class="fretboard-container" id="fretboardContainer">
@@ -655,12 +716,15 @@
         const translations = {
             pl: {
                 title: '🎸 Trener dźwięków na gryfie',
-                backToHome: '← Powrót do paveu.pl',
-                numberOfFrets: 'Liczba progów',
+                backToHome: '← Powrót do https://paveu.pl/#music-theory',
+                fretRange: 'Zakres progów',
                 frets12: '12 progów',
                 frets15: '15 progów',
-                frets22: '22 progów',
-                frets24: '24 progów',
+                frets22: '22 progi',
+                frets24: '24 progi',
+                customRange: 'Własny zakres',
+                fretFrom: 'Od progu',
+                fretTo: 'Do progu',
                 noteNotation: 'Notacja dźwięków',
                 sharps: 'Krzyżyki (#)',
                 flats: 'Bemole (♭)',
@@ -692,16 +756,20 @@
                 reviewModeDesc: 'Ćwiczysz błędne odpowiedzi',
                 noMistakes: '🎉 Brawo! Nie masz błędnych odpowiedzi do powtórki!',
                 timeUp: '⏰ Czas minął! Rozpoczynamy powtórkę błędów...',
-                validMinutes: 'Proszę podać prawidłową liczbę minut (1-120)'
+                validMinutes: 'Proszę podać prawidłową liczbę minut (1-120)',
+                invalidFretRange: 'Proszę podać prawidłowy zakres progów (1-24, od ≤ do)'
             },
             en: {
                 title: '🎸 Fretboard Notes Trainer',
-                backToHome: '← Back to paveu.pl',
-                numberOfFrets: 'Number of Frets',
+                backToHome: '← Back to https://paveu.pl/#music-theory',
+                fretRange: 'Fret Range',
                 frets12: '12 frets',
                 frets15: '15 frets',
                 frets22: '22 frets',
                 frets24: '24 frets',
+                customRange: 'Custom range',
+                fretFrom: 'From fret',
+                fretTo: 'To fret',
                 noteNotation: 'Note Notation',
                 sharps: 'Sharps (#)',
                 flats: 'Flats (♭)',
@@ -733,19 +801,21 @@
                 reviewModeDesc: 'Practicing mistakes',
                 noMistakes: '🎉 Great! You have no mistakes to review!',
                 timeUp: '⏰ Time is up! Starting mistake review...',
-                validMinutes: 'Please enter a valid number of minutes (1-120)'
+                validMinutes: 'Please enter a valid number of minutes (1-120)',
+                invalidFretRange: 'Please enter a valid fret range (1-24, from ≤ to)'
             }
         };
 
         // Standard tuning from 1st string (high E) to 6th string (low E)
         const standardTuning = ['E', 'B', 'G', 'D', 'A', 'E'];
-        const chromaticScale = ['C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B'];
+        const chromaticScale = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        const chromaticScaleFlats = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 
-        class FretboardTrainer {
-            constructor() {
+        class FretboardTrainer {constructor() {
                 this.config = {
-                    frets: 12,
-                    notation: 'sharps',
+                    fretFrom: 1,
+                    fretTo: 12,
+                    notation: 'both',
                     strings: [1, 2, 3, 4, 5, 6],
                     theme: 'dark-minimal',
                     language: 'pl'
@@ -762,6 +832,8 @@
                 this.reviewMistakes = [];
                 this.boundModalClickHandler = null;
                 this.boundModalKeyHandler = null;
+                this.isShowingError = false;
+                this.isShowingCorrect = false;
 
                 this.init();
             }
@@ -809,17 +881,42 @@
                     });
                 });
 
-                // Set initial language based on browser or default to Polish
-                const browserLang = navigator.language.toLowerCase();
-                if (browserLang.startsWith('en')) {
-                    this.setLanguage('en');
-                } else {
-                    this.setLanguage('pl');
-                }
+                // Handle custom fret range visibility
+                document.querySelectorAll('input[name="frets"]').forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        const fretRangeInputs = document.getElementById('fretRangeInputs');
+                        if (e.target.value === 'custom') {
+                            fretRangeInputs.style.display = 'grid';
+                        } else {
+                            fretRangeInputs.style.display = 'none';
+                        }
+                    });
+                });
+
+                // Set initial language to Polish
+                this.setLanguage('pl');
             }
 
             startApp() {
-                this.config.frets = parseInt(document.querySelector('input[name="frets"]:checked').value);
+                const fretMode = document.querySelector('input[name="frets"]:checked').value;
+
+                if (fretMode === 'custom') {
+                    const fretFrom = parseInt(document.getElementById('fretFrom').value);
+                    const fretTo = parseInt(document.getElementById('fretTo').value);
+
+                    if (isNaN(fretFrom) || isNaN(fretTo) || fretFrom < 1 || fretTo > 24 || fretFrom > fretTo) {
+                        alert(this.t('invalidFretRange'));
+                        return;
+                    }
+
+                    this.config.fretFrom = fretFrom;
+                    this.config.fretTo = fretTo;
+                } else {
+                    const fretCount = parseInt(fretMode.split('-')[1]);
+                    this.config.fretFrom = 1;
+                    this.config.fretTo = fretCount;
+                }
+
                 this.config.notation = document.querySelector('input[name="notation"]:checked').value;
                 this.config.theme = document.querySelector('input[name="theme"]:checked').value;
 
@@ -929,7 +1026,7 @@
                 const svg = document.getElementById('fretboard');
                 svg.innerHTML = '';
 
-                const fretCount = this.config.frets;
+                const fretCount = this.config.fretTo;
                 const fretWidth = 80;
                 const stringSpacing = 40;
                 const svgWidth = (fretCount + 1) * fretWidth + 100;
@@ -1012,6 +1109,8 @@
                     string.setAttribute('y2', y);
                     string.setAttribute('stroke', stringColor);
                     string.setAttribute('stroke-width', 1.5 + (5 - i) * 0.5);
+                    string.setAttribute('data-string-index', i);
+                    string.classList.add('fretboard-string');
                     svg.appendChild(string);
 
                     const stringLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -1031,6 +1130,11 @@
             }
 
             showNoteModal() {
+                // Don't open modal if showing error OR if answer is correct and waiting for next question
+                if (this.isShowingError || this.isShowingCorrect) {
+                    return;
+                }
+
                 this.closeNoteModal();
                 const modal = document.getElementById('noteModal');
                 modal.innerHTML = '';
@@ -1052,7 +1156,8 @@
                 } else if (this.config.notation === 'flats') {
                     noteList = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
                 } else {
-                    noteList = ['C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B'];
+                    // Both notation - show combined format
+                    noteList = ['C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B'];
                 }
 
                 noteList.forEach(note => {
@@ -1176,6 +1281,11 @@
             }
 
             selectNote(note) {
+                // Prevent selecting a new note if we're showing an error message OR showing correct answer
+                if (this.isShowingError || this.isShowingCorrect) {
+                    return;
+                }
+
                 this.selectedNote = note;
                 const selector = document.getElementById('noteSelector');
                 selector.textContent = note;
@@ -1191,10 +1301,18 @@
                 document.getElementById('result').textContent = '';
                 document.getElementById('result').className = 'result-message';
                 this.selectedNote = null;
+                this.isShowingError = false;
+                this.isShowingCorrect = false;
 
                 const svg = document.getElementById('fretboard');
                 const oldHighlight = svg.querySelector('.highlight-circle');
                 if (oldHighlight) oldHighlight.remove();
+
+                // Remove previous string highlight
+                const strings = svg.querySelectorAll('.fretboard-string');
+                strings.forEach(string => {
+                    string.classList.remove('string-highlighted');
+                });
 
                 let stringIndex, fret, note;
 
@@ -1210,17 +1328,25 @@
                     this.showStartScreen();
                     return;
                 } else {
+                    // Generate random question from fretFrom to fretTo (no open strings)
                     stringIndex = this.config.strings[Math.floor(Math.random() * this.config.strings.length)] - 1;
-                    fret = Math.floor(Math.random() * (this.config.frets + 1));
+                    fret = Math.floor(Math.random() * (this.config.fretTo - this.config.fretFrom + 1)) + this.config.fretFrom;
+
                     const openString = standardTuning[stringIndex];
                     note = this.getNoteAtFret(openString, fret);
                 }
 
                 this.currentQuestion = { string: stringIndex + 1, fret: fret, note: note, stringIndex: stringIndex };
 
+                // Highlight the string
+                const targetString = svg.querySelector(`.fretboard-string[data-string-index="${stringIndex}"]`);
+                if (targetString) {
+                    targetString.classList.add('string-highlighted');
+                }
+
                 const fretWidth = 80;
                 const stringSpacing = 40;
-                const x = fret === 0 ? 50 : 50 + (fret - 0.5) * fretWidth;
+                const x = 50 + (fret - 0.5) * fretWidth;
                 const y = 20 + stringIndex * stringSpacing;
 
                 const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -1232,6 +1358,15 @@
                 highlight.setAttribute('stroke', '#ffffff');
                 highlight.setAttribute('stroke-width', '3');
                 highlight.setAttribute('class', 'highlight-circle');
+
+                // Add SVG animation for pulsing radius
+                const animateRadius = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+                animateRadius.setAttribute('attributeName', 'r');
+                animateRadius.setAttribute('values', '20;24;20');
+                animateRadius.setAttribute('dur', '2s');
+                animateRadius.setAttribute('repeatCount', 'indefinite');
+                highlight.appendChild(animateRadius);
+
                 svg.appendChild(highlight);
 
                 // Scroll to the highlighted note
@@ -1244,7 +1379,7 @@
             }
 
             getNoteAtFret(startNote, fret) {
-                const noteIndex = chromaticScale.findIndex(n => n.includes(startNote));
+                const noteIndex = chromaticScale.findIndex(n => n === startNote);
                 const targetIndex = (noteIndex + fret) % 12;
                 return chromaticScale[targetIndex];
             }
@@ -1267,18 +1402,27 @@
                     selector.classList.remove('incorrect');
                     selector.classList.add('correct');
 
+                    // Block further selections while showing correct answer
+                    this.isShowingCorrect = true;
+
                     if (this.reviewMode) {
                         this.reviewMistakes = this.reviewMistakes.filter(m =>
                             !(m.stringIndex === this.currentQuestion.stringIndex && m.fret === this.currentQuestion.fret)
                         );
                     }
 
-                    setTimeout(() => this.nextQuestion(), 1500);
+                    setTimeout(() => {
+                        this.isShowingCorrect = false;
+                        this.nextQuestion();
+                    }, 1500);
                 } else {
                     resultDiv.textContent = `${this.t('incorrect')} ${this.formatNote(correctNote)}`;
                     resultDiv.className = 'result-message incorrect';
                     selector.classList.remove('correct');
                     selector.classList.add('incorrect');
+
+                    // Block further selections while showing error
+                    this.isShowingError = true;
 
                     if (!this.reviewMode && this.timerMode) {
                         const mistakeExists = this.mistakes.some(m =>
@@ -1293,18 +1437,37 @@
                         }
                     }
 
-                    if (this.timerMode || this.reviewMode) {
-                        this.selectedNote = null;
-                        setTimeout(() => this.nextQuestion(), 2000);
-                    } else {
-                        this.selectedNote = null;
-                    }
+                    // In "no timer" mode, show correct answer for 2 seconds and move to next question
+                    this.selectedNote = null;
+                    setTimeout(() => {
+                        this.isShowingError = false;
+                        this.nextQuestion();
+                    }, 2000);
                 }
 
                 this.updateScore();
             }
 
             isEnharmonicMatch(userAnswer, correctNote) {
+                // Extract base notes from combined format like "C#/Db"
+                const extractNotes = (note) => {
+                    if (note.includes('/')) {
+                        return note.split('/');
+                    }
+                    return [note];
+                };
+
+                const userNotes = extractNotes(userAnswer);
+                const correctNotes = extractNotes(correctNote);
+
+                // Check if any combination matches
+                for (const un of userNotes) {
+                    for (const cn of correctNotes) {
+                        if (un === cn) return true;
+                    }
+                }
+
+                // Additional enharmonic check
                 const enharmonicMap = {
                     'C#': ['C#', 'Db'], 'Db': ['C#', 'Db'],
                     'D#': ['D#', 'Eb'], 'Eb': ['D#', 'Eb'],
@@ -1313,21 +1476,38 @@
                     'A#': ['A#', 'Bb'], 'Bb': ['A#', 'Bb']
                 };
 
-                if (correctNote.includes(userAnswer)) return true;
-                if (enharmonicMap[userAnswer]) {
-                    return enharmonicMap[userAnswer].some(note => correctNote.includes(note));
+                for (const un of userNotes) {
+                    for (const cn of correctNotes) {
+                        if (enharmonicMap[un] && enharmonicMap[un].includes(cn)) {
+                            return true;
+                        }
+                        if (enharmonicMap[cn] && enharmonicMap[cn].includes(un)) {
+                            return true;
+                        }
+                    }
                 }
+
                 return false;
             }
 
             formatNote(note) {
                 if (this.config.notation === 'sharps') {
-                    return note.split('/')[0];
+                    const sharpMap = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#' };
+                    return sharpMap[note] || note;
                 } else if (this.config.notation === 'flats') {
-                    const parts = note.split('/');
-                    return parts.length > 1 ? parts[1] : parts[0];
+                    const flatMap = { 'C#': 'Db', 'D#': 'Eb', 'F#': 'Gb', 'G#': 'Ab', 'A#': 'Bb' };
+                    return flatMap[note] || note;
+                } else {
+                    // Both notation - show combined format
+                    const bothMap = {
+                        'C#': 'C#/Db', 'Db': 'C#/Db',
+                        'D#': 'D#/Eb', 'Eb': 'D#/Eb',
+                        'F#': 'F#/Gb', 'Gb': 'F#/Gb',
+                        'G#': 'G#/Ab', 'Ab': 'G#/Ab',
+                        'A#': 'A#/Bb', 'Bb': 'A#/Bb'
+                    };
+                    return bothMap[note] || note;
                 }
-                return note;
             }
 
             updateScore() {
