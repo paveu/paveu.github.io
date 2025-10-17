@@ -974,10 +974,12 @@ nav a.active {
 }
 
 .music-theory-content {
-    max-width: 800px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
     margin: 0 auto;
 }
-
 .tool-card {
     background: var(--bg);
     border: 1px solid var(--border);
@@ -985,6 +987,8 @@ nav a.active {
     padding: 3rem;
     transition: all 0.3s ease;
     margin-bottom: 2rem;
+    display: flex;              /* ADD THIS */
+    flex-direction: column;     /* ADD THIS */
 }
 
 .tool-card:hover {
@@ -1005,6 +1009,7 @@ nav a.active {
     margin-bottom: 2rem;
     font-size: 1.1rem;
     line-height: 1.6;
+    flex: 1;                    /* ADD THIS */
 }
 
 [data-theme="light"] .tool-card p {

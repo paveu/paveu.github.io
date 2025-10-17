@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Fretboard Notes Trainer - Interactive Guitar Learning Tool | paveu.pl</title>
+
+    <meta name="description" content="Interactive Fretboard Trainer for learning all guitar notes on the fretboard. Practice with dropdown selection, keyboard navigation, instant validation, and mistake review mode. Perfect for guitar students and teachers.">
+    <meta name="keywords" content="Fretboard Notes, Guitar Learning, Music Theory, Guitar Trainer, Music Education, Interactive Learning, Guitar Frets, Guitar Strings, Music Practice, Fretboard Memorization, Guitar Theory App, Learning Tool">
+    <meta name="author" content="Paweł Stępak">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="distribution" content="global">
+    <meta name="rating" content="general">
+    <meta name="generator" content="Custom HTML">
+    <meta name="copyright" content="Paweł Stępak">
+
+    <meta property="og:title" content="Fretboard Notes Trainer - Interactive Guitar Learning Tool">
+    <meta property="og:description" content="Learn all guitar fretboard notes with interactive exercises. Features instant validation, keyboard navigation, mistake review mode and practice timer for effective learning.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://paveu.pl/fretboard.html">
+    <meta property="og:site_name" content="paveu.pl - Music Theory Tools">
+    <meta property="og:locale" content="en_US">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Fretboard Notes Trainer - Interactive Guitar Learning Tool">
+    <meta name="twitter:description" content="Learn all guitar fretboard notes with interactive exercises. Features instant validation, keyboard navigation, and mistake review mode.">
+
+    <link rel="canonical" href="https://paveu.pl/fretboard.html">
+    <meta name="theme-color" content="#5c6bc0">
+    <meta name="msapplication-TileColor" content="#5c6bc0">
+    <meta name="format-detection" content="telephone=no">
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root[data-theme="light-minimal"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --bg-tertiary: #e8e8e8;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-color: #cccccc;
+            --hover-bg: #f0f0f0;
+            --correct: #4caf50;
+            --incorrect: #f44336;
+            --accent: #5c6bc0;
+            --button-bg: #5c6bc0;
+            --button-hover: #3f51b5;
+            --fretboard-wood: #8B4513;
+            --fret-wire: #C0C0C0;
+            --string-color: #FFD700;
+            --dot-color: #D3D3D3;
+        }
+
+        :root[data-theme="dark-minimal"] {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --bg-tertiary: #3a3a3a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --border-color: #444444;
+            --hover-bg: #3a3a3a;
+            --correct: #4caf50;
+            --incorrect: #f44336;
+            --accent: #7986cb;
+            --button-bg: #5c6bc0;
+            --button-hover: #7986cb;
+            --fretboard-wood: #654321;
+            --fret-wire: #A9A9A9;
+            --string-color: #DAA520;
+            --dot-color: #808080;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .back-to-home {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            z-index: 1000;
+        }
+
+        .back-to-home:hover {
+            background: var(--hover-bg);
+            border-color: var(--accent);
+            transform: translateX(-3px);
+        }
+
+        .language-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 5px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 5px;
+            z-index: 1000;
+        }
+
+        .language-switcher button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            font-size: 0.9em;
+        }
+
+        .language-switcher button:hover {
+            background: var(--hover-bg);
+        }
+
+        .language-switcher button.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        #startScreen {
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--bg-secondary);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .config-section {
+            margin-bottom: 30px;
+        }
+
+        .config-section h3 {
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            font-size: 1.2em;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .radio-option:hover {
+            background: var(--hover-bg);
+            border-color: var(--accent);
+        }
+
+        .radio-option input[type="radio"],
+        .radio-option input[type="checkbox"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .string-checkboxes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-option:hover {
+            background: var(--hover-bg);
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .checkbox-option label {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .info-box {
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .start-button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: white;
+            background: var(--button-bg);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .start-button:hover {
+            background: var(--button-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        #mainScreen {
+            display: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 1em;
+            color: white;
+            background: var(--button-bg);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: var(--button-hover);
+            transform: translateY(-2px);
+        }
+
+        .timer-display {
+            padding: 12px 24px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timer-display.warning {
+            color: #f59e0b;
+            border-color: #f59e0b;
+        }
+
+        .timer-display.danger {
+            color: #ef4444;
+            border-color: #ef4444;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .progress {
+            padding: 12px 24px;
+            font-size: 1em;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .fretboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            overflow-x: auto;
+            padding: 20px;
+        }
+
+        #fretboard {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .note-input-section {
+            max-width: 600px;
+            margin: 30px auto;
+            text-align: center;
+            position: relative;
+        }
+
+        .question {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .click-to-select {
+            padding: 20px;
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.2em;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .click-to-select:hover {
+            background: var(--hover-bg);
+            border-color: var(--accent);
+        }
+
+        .click-to-select.has-selection {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .click-to-select.correct {
+            background: var(--correct);
+            color: white;
+            border-color: var(--correct);
+        }
+
+        .click-to-select.incorrect {
+            background: var(--incorrect);
+            color: white;
+            border-color: var(--incorrect);
+        }
+
+        .result-message {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-top: 20px;
+            min-height: 40px;
+        }
+
+        .result-message.correct {
+            color: var(--correct);
+        }
+
+        .result-message.incorrect {
+            color: var(--incorrect);
+        }
+
+        #noteModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10000;
+            background: var(--bg-primary);
+            border: 2px solid #000000;
+            border-radius: 8px;
+            padding: 8px;
+            padding-top: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+            max-height: 400px;
+            height: 400px;
+            width: 300px;
+            overflow-y: scroll;
+        }
+
+        #noteModal.active {
+            display: block !important;
+            visibility: visible !important;
+        }
+
+        #noteModal .close-modal-btn {
+            position: sticky;
+            top: 0;
+            float: right;
+            width: 28px;
+            height: 28px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 300;
+            z-index: 10001;
+            padding: 0;
+            margin-bottom: 8px;
+        }
+
+        #noteModal .close-modal-btn:hover {
+            background: var(--incorrect);
+            color: white;
+            border-color: var(--incorrect);
+        }
+
+        .modal-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1.1em;
+            margin-bottom: 2px;
+            border: 1px solid transparent;
+            user-select: none;
+            font-weight: 500;
+        }
+
+        .modal-option:hover {
+            background: var(--hover-bg);
+        }
+
+        .modal-option.keyboard-focused {
+            background: var(--accent);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            #startScreen {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .back-to-home, .language-switcher {
+                position: static;
+                margin-bottom: 20px;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .btn, .progress, .timer-display {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="language-switcher">
+            <button id="langPL" class="active" onclick="App.setLanguage('pl')">PL</button>
+            <button id="langEN" onclick="App.setLanguage('en')">EN</button>
+        </div>
+
+        <div id="startScreen">
+            <a href="https://paveu.pl" class="back-to-home">← Back to paveu.pl</a>
+
+            <h1>🎸 Fretboard Notes Trainer</h1>
+
+            <div class="config-section">
+                <h3>Number of Frets</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="frets" value="12" checked>
+                        <span>12 frets</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="frets" value="15">
+                        <span>15 frets</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="frets" value="22">
+                        <span>22 frets</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="frets" value="24">
+                        <span>24 frets</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3>Note Notation</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="notation" value="sharps" checked>
+                        <span>Sharps (#)</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="notation" value="flats">
+                        <span>Flats (♭)</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="notation" value="both">
+                        <span>Both (# and ♭)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3>Strings to Practice</h3>
+                <div class="string-checkboxes">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="string6" value="6" checked>
+                        <label for="string6">6th (E)</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="string5" value="5" checked>
+                        <label for="string5">5th (A)</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="string4" value="4" checked>
+                        <label for="string4">4th (D)</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="string3" value="3" checked>
+                        <label for="string3">3rd (G)</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="string2" value="2" checked>
+                        <label for="string2">2nd (B)</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="string1" value="1" checked>
+                        <label for="string1">1st (E)</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3>Practice Timer & Mistake Review</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="timer-mode" value="no-timer" checked>
+                        <span>No timer</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="timer-mode" value="custom">
+                        <span>Practice time (minutes): <input type="number" id="timerMinutes" min="1" max="120" value="10" style="margin-left: 10px; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); width: 80px;"></span>
+                    </label>
+                </div>
+                <div class="info-box">
+                    ℹ️ After timer ends, you'll practice only the mistakes you made
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3>Theme</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="theme" value="light-minimal">
+                        <span>Light Minimal</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="theme" value="dark-minimal" checked>
+                        <span>Dark Minimal</span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="start-button" onclick="App.startApp()">START PRACTICE</button>
+        </div>
+
+        <div id="mainScreen">
+            <a href="https://paveu.pl" class="back-to-home">← Back to paveu.pl</a>
+
+            <h1>🎸 Fretboard Notes Trainer</h1>
+
+            <div class="controls">
+                <button class="btn" onclick="App.showStartScreen()">← Menu</button>
+                <button class="btn" onclick="App.nextQuestion()">⏭️ Skip</button>
+                <div id="timerDisplay" class="timer-display" style="display: none;">
+                    ⏱️ <span id="timerText">00:00</span>
+                </div>
+                <div class="progress" id="progress">Score: 0/0</div>
+            </div>
+
+            <div class="fretboard-container">
+                <svg id="fretboard" width="1400" height="300"></svg>
+            </div>
+
+            <div class="note-input-section">
+                <div class="question" id="question">Click to select a note!</div>
+
+                <div class="click-to-select" id="noteSelector">
+                    Click here to select a note
+                </div>
+
+                <div class="result-message" id="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="noteModal"></div>
+
+    <script>
+        const translations = {
+            pl: {
+                title: '🎸 Trener Nut na Gryfie',
+                backToHome: '← Powrót do paveu.pl',
+                numberOfFrets: 'Liczba progów',
+                frets12: '12 progów',
+                frets15: '15 progów',
+                frets22: '22 progów',
+                frets24: '24 progów',
+                noteNotation: 'Notacja nut',
+                sharps: 'Krzyżyki (#)',
+                flats: 'Bemole (♭)',
+                both: 'Oba (# i ♭)',
+                sharpsSuffix: ' - C, C#, D, D#, E, F, F#, G, G#, A, A#, B',
+                flatsSuffix: ' - C, Db, D, Eb, E, F, Gb, G, Ab, A, Bb, B',
+                bothSuffix: ' - Wszystkie warianty',
+                stringsToPractice: 'Struny do ćwiczenia',
+                string6: '6. (E)',
+                string5: '5. (A)',
+                string4: '4. (D)',
+                string3: '3. (G)',
+                string2: '2. (B)',
+                string1: '1. (E)',
+                theme: 'Motyw',
+                lightMinimal: 'Jasny minimalny',
+                darkMinimal: 'Ciemny minimalny',
+                startPractice: 'ROZPOCZNIJ ĆWICZENIE',
+                menu: '← Menu',
+                skip: '⏭️ Pomiń',
+                score: 'Wynik',
+                question: 'Jaka to nuta?',
+                clickToSelect: 'Kliknij, aby wybrać nutę',
+                correct: '✓ Poprawnie!',
+                incorrect: '✗ Błąd! Prawidłowa odpowiedź:',
+                selectAtLeastOne: 'Proszę wybrać przynajmniej jedną strunę!',
+                practiceTimerTitle: 'Timer ćwiczeń i powtórka błędów',
+                noTimer: 'Bez timera',
+                practiceTime: 'Czas ćwiczenia (minuty):',
+                timerInfo: 'ℹ️ Po zakończeniu timera poćwiczysz tylko błędne odpowiedzi',
+                reviewMode: 'Tryb powtórki błędów',
+                reviewModeDesc: 'Ćwiczysz błędne odpowiedzi',
+                noMistakes: '🎉 Brawo! Nie masz błędnych odpowiedzi do powtórki!',
+                timeUp: '⏰ Czas minął! Rozpoczynamy powtórkę błędów...',
+                validMinutes: 'Proszę podać prawidłową liczbę minut (1-120)'
+            },
+            en: {
+                title: '🎸 Fretboard Notes Trainer',
+                backToHome: '← Back to paveu.pl',
+                numberOfFrets: 'Number of Frets',
+                frets12: '12 frets',
+                frets15: '15 frets',
+                frets22: '22 frets',
+                frets24: '24 frets',
+                noteNotation: 'Note Notation',
+                sharps: 'Sharps (#)',
+                flats: 'Flats (♭)',
+                both: 'Both (# and ♭)',
+                sharpsSuffix: ' - C, C#, D, D#, E, F, F#, G, G#, A, A#, B',
+                flatsSuffix: ' - C, Db, D, Eb, E, F, Gb, G, Ab, A, Bb, B',
+                bothSuffix: ' - All variations',
+                stringsToPractice: 'Strings to Practice',
+                string6: '6th (E)',
+                string5: '5th (A)',
+                string4: '4th (D)',
+                string3: '3rd (G)',
+                string2: '2nd (B)',
+                string1: '1st (E)',
+                theme: 'Theme',
+                lightMinimal: 'Light Minimal',
+                darkMinimal: 'Dark Minimal',
+                startPractice: 'START PRACTICE',
+                menu: '← Menu',
+                skip: '⏭️ Skip',
+                score: 'Score',
+                question: 'What note is this?',
+                clickToSelect: 'Click here to select a note',
+                correct: '✓ Correct!',
+                incorrect: '✗ Wrong! Correct answer:',
+                selectAtLeastOne: 'Please select at least one string!',
+                practiceTimerTitle: 'Practice Timer & Mistake Review',
+                noTimer: 'No timer',
+                practiceTime: 'Practice time (minutes):',
+                timerInfo: 'ℹ️ After timer ends, you\'ll practice only the mistakes you made',
+                reviewMode: 'Mistake Review Mode',
+                reviewModeDesc: 'Practicing mistakes',
+                noMistakes: '🎉 Great! You have no mistakes to review!',
+                timeUp: '⏰ Time is up! Starting mistake review...',
+                validMinutes: 'Please enter a valid number of minutes (1-120)'
+            }
+        };
+
+        const standardTuning = ['E', 'A', 'D', 'G', 'B', 'E'];
+        const chromaticScale = ['C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B'];
+
+        class FretboardTrainer {
+            constructor() {
+                this.config = {
+                    frets: 12,
+                    notation: 'sharps',
+                    strings: [1, 2, 3, 4, 5, 6],
+                    theme: 'dark-minimal',
+                    language: 'pl'
+                };
+
+                this.currentQuestion = null;
+                this.score = { correct: 0, total: 0 };
+                this.selectedNote = null;
+                this.timerInterval = null;
+                this.timerSeconds = 0;
+                this.timerMode = false;
+                this.mistakes = [];
+                this.reviewMode = false;
+                this.reviewMistakes = [];
+                this.boundModalClickHandler = null;
+                this.boundModalKeyHandler = null;
+
+                this.init();
+            }
+
+            t(key) {
+                return translations[this.config.language][key] || key;
+            }
+
+            setLanguage(lang) {
+                this.config.language = lang;
+                document.getElementById('langPL').classList.toggle('active', lang === 'pl');
+                document.getElementById('langEN').classList.toggle('active', lang === 'en');
+                this.updateTranslations();
+            }
+
+            updateTranslations() {
+                document.querySelectorAll('h1').forEach(el => el.textContent = this.t('title'));
+                document.querySelectorAll('.back-to-home').forEach(el => el.textContent = this.t('backToHome'));
+
+                const configSections = document.querySelectorAll('.config-section h3');
+                if (configSections[0]) configSections[0].textContent = this.t('numberOfFrets');
+                if (configSections[1]) configSections[1].textContent = this.t('noteNotation');
+                if (configSections[2]) configSections[2].textContent = this.t('stringsToPractice');
+                if (configSections[3]) configSections[3].textContent = this.t('practiceTimerTitle');
+                if (configSections[4]) configSections[4].textContent = this.t('theme');
+
+                // Update radio labels
+                const radioLabels = document.querySelectorAll('.radio-option span');
+                if (radioLabels[0]) radioLabels[0].textContent = this.t('frets12');
+                if (radioLabels[1]) radioLabels[1].textContent = this.t('frets15');
+                if (radioLabels[2]) radioLabels[2].textContent = this.t('frets22');
+                if (radioLabels[3]) radioLabels[3].textContent = this.t('frets24');
+                if (radioLabels[4]) radioLabels[4].textContent = this.t('sharps') + this.t('sharpsSuffix');
+                if (radioLabels[5]) radioLabels[5].textContent = this.t('flats') + this.t('flatsSuffix');
+                if (radioLabels[6]) radioLabels[6].textContent = this.t('both') + this.t('bothSuffix');
+                if (radioLabels[7]) radioLabels[7].textContent = this.t('noTimer');
+                if (radioLabels[8]) {
+                    const input = radioLabels[8].querySelector('#timerMinutes');
+                    if (input) {
+                        const inputValue = input.value;
+                        radioLabels[8].textContent = this.t('practiceTime') + ' ';
+                        input.value = inputValue;
+                        radioLabels[8].appendChild(input);
+                    }
+                }
+                if (radioLabels[9]) radioLabels[9].textContent = this.t('lightMinimal');
+                if (radioLabels[10]) radioLabels[10].textContent = this.t('darkMinimal');
+
+                const infoBox = document.querySelector('.info-box');
+                if (infoBox) infoBox.textContent = this.t('timerInfo');
+
+                // Update string checkboxes
+                const stringLabels = document.querySelectorAll('.checkbox-option label');
+                if (stringLabels[0]) stringLabels[0].textContent = this.t('string6');
+                if (stringLabels[1]) stringLabels[1].textContent = this.t('string5');
+                if (stringLabels[2]) stringLabels[2].textContent = this.t('string4');
+                if (stringLabels[3]) stringLabels[3].textContent = this.t('string3');
+                if (stringLabels[4]) stringLabels[4].textContent = this.t('string2');
+                if (stringLabels[5]) stringLabels[5].textContent = this.t('string1');
+
+                document.querySelector('.start-button').textContent = this.t('startPractice');
+
+                const buttons = document.querySelectorAll('#mainScreen .btn');
+                if (buttons[0]) buttons[0].textContent = this.t('menu');
+                if (buttons[1]) buttons[1].textContent = this.t('skip');
+
+                if (document.getElementById('mainScreen').style.display === 'block') {
+                    const selector = document.getElementById('noteSelector');
+                    if (!this.selectedNote) {
+                        selector.textContent = this.t('clickToSelect');
+                    }
+                    this.updateScore();
+                }
+            }
+
+            init() {
+                document.documentElement.setAttribute('data-theme', this.config.theme);
+
+                document.querySelectorAll('input[name="theme"]').forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        document.documentElement.setAttribute('data-theme', e.target.value);
+                        this.config.theme = e.target.value;
+                    });
+                });
+
+                document.querySelectorAll('.checkbox-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        if (e.target.type !== 'checkbox') {
+                            const checkbox = option.querySelector('input[type="checkbox"]');
+                            checkbox.checked = !checkbox.checked;
+                        }
+                    });
+                });
+
+                this.updateTranslations();
+            }
+
+            startApp() {
+                this.config.frets = parseInt(document.querySelector('input[name="frets"]:checked').value);
+                this.config.notation = document.querySelector('input[name="notation"]:checked').value;
+                this.config.theme = document.querySelector('input[name="theme"]:checked').value;
+
+                const selectedStrings = [];
+                document.querySelectorAll('.string-checkboxes input[type="checkbox"]:checked').forEach(cb => {
+                    selectedStrings.push(parseInt(cb.value));
+                });
+
+                if (selectedStrings.length === 0) {
+                    alert(this.t('selectAtLeastOne'));
+                    return;
+                }
+
+                this.config.strings = selectedStrings;
+
+                const timerMode = document.querySelector('input[name="timer-mode"]:checked').value;
+                if (timerMode === 'custom') {
+                    const timerMinutes = parseInt(document.getElementById('timerMinutes').value);
+                    if (isNaN(timerMinutes) || timerMinutes < 1 || timerMinutes > 120) {
+                        alert(this.t('validMinutes'));
+                        return;
+                    }
+                    this.timerMode = true;
+                    this.startTimer(timerMinutes);
+                } else {
+                    this.timerMode = false;
+                }
+
+                this.score = { correct: 0, total: 0 };
+                this.mistakes = [];
+                this.reviewMode = false;
+                this.reviewMistakes = [];
+
+                document.getElementById('startScreen').style.display = 'none';
+                document.getElementById('mainScreen').style.display = 'block';
+
+                this.drawFretboard();
+                this.setupNoteSelector();
+                this.nextQuestion();
+            }
+
+            showStartScreen() {
+                this.closeNoteModal();
+                this.stopTimer();
+                document.getElementById('mainScreen').style.display = 'none';
+                document.getElementById('startScreen').style.display = 'block';
+            }
+
+            startTimer(minutes) {
+                this.timerSeconds = minutes * 60;
+                this.updateTimerDisplay();
+                document.getElementById('timerDisplay').style.display = 'inline-flex';
+
+                if (this.timerInterval) clearInterval(this.timerInterval);
+
+                this.timerInterval = setInterval(() => {
+                    this.timerSeconds--;
+                    this.updateTimerDisplay();
+                    if (this.timerSeconds <= 0) {
+                        this.stopTimer();
+                        this.startReviewMode();
+                    }
+                }, 1000);
+            }
+
+            stopTimer() {
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                    this.timerInterval = null;
+                }
+                const timerDisplay = document.getElementById('timerDisplay');
+                if (timerDisplay) timerDisplay.style.display = 'none';
+            }
+
+            updateTimerDisplay() {
+                const minutes = Math.floor(this.timerSeconds / 60);
+                const seconds = this.timerSeconds % 60;
+                const timeText = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+                document.getElementById('timerText').textContent = timeText;
+                const timerDisplay = document.getElementById('timerDisplay');
+                timerDisplay.classList.remove('warning', 'danger');
+                if (this.timerSeconds <= 60) {
+                    timerDisplay.classList.add('danger');
+                } else if (this.timerSeconds <= 180) {
+                    timerDisplay.classList.add('warning');
+                }
+            }
+
+            startReviewMode() {
+                if (this.mistakes.length === 0) {
+                    alert(this.t('noMistakes'));
+                    this.showStartScreen();
+                    return;
+                }
+
+                alert(this.t('timeUp'));
+                this.reviewMode = true;
+                this.reviewMistakes = [...this.mistakes];
+                this.mistakes = [];
+                this.score = { correct: 0, total: 0 };
+                this.updateScore();
+                this.nextQuestion();
+            }
+
+            drawFretboard() {
+                const svg = document.getElementById('fretboard');
+                svg.innerHTML = '';
+
+                const fretCount = this.config.frets;
+                const fretWidth = 80;
+                const stringSpacing = 40;
+                const svgWidth = (fretCount + 1) * fretWidth + 100;
+                const svgHeight = 6 * stringSpacing + 40;
+
+                svg.setAttribute('width', svgWidth);
+                svg.setAttribute('height', svgHeight);
+                svg.setAttribute('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
+
+                const woodColor = getComputedStyle(document.documentElement).getPropertyValue('--fretboard-wood').trim();
+                const fretColor = getComputedStyle(document.documentElement).getPropertyValue('--fret-wire').trim();
+                const stringColor = getComputedStyle(document.documentElement).getPropertyValue('--string-color').trim();
+                const dotColor = getComputedStyle(document.documentElement).getPropertyValue('--dot-color').trim();
+
+                const fretboard = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                fretboard.setAttribute('x', '50');
+                fretboard.setAttribute('y', '20');
+                fretboard.setAttribute('width', fretCount * fretWidth);
+                fretboard.setAttribute('height', 5 * stringSpacing);
+                fretboard.setAttribute('fill', woodColor);
+                fretboard.setAttribute('rx', '5');
+                svg.appendChild(fretboard);
+
+                for (let i = 0; i <= fretCount; i++) {
+                    const x = 50 + i * fretWidth;
+                    const fret = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    fret.setAttribute('x1', x);
+                    fret.setAttribute('y1', '20');
+                    fret.setAttribute('x2', x);
+                    fret.setAttribute('y2', 20 + 5 * stringSpacing);
+                    fret.setAttribute('stroke', fretColor);
+                    fret.setAttribute('stroke-width', i === 0 ? '6' : '3');
+                    svg.appendChild(fret);
+
+                    if (i > 0) {
+                        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                        text.setAttribute('x', x - fretWidth / 2);
+                        text.setAttribute('y', 5 * stringSpacing + 50);
+                        text.setAttribute('text-anchor', 'middle');
+                        text.setAttribute('fill', 'var(--text-secondary)');
+                        text.setAttribute('font-size', '14');
+                        text.textContent = i;
+                        svg.appendChild(text);
+                    }
+                }
+
+                const dotFrets = [3, 5, 7, 9, 12, 15, 17, 19, 21, 24];
+                const doubleDotFrets = [12, 24];
+
+                dotFrets.forEach(fret => {
+                    if (fret <= fretCount) {
+                        const x = 50 + (fret - 0.5) * fretWidth;
+                        if (doubleDotFrets.includes(fret)) {
+                            [1.5, 3.5].forEach(yPos => {
+                                const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                                dot.setAttribute('cx', x);
+                                dot.setAttribute('cy', 20 + yPos * stringSpacing);
+                                dot.setAttribute('r', '8');
+                                dot.setAttribute('fill', dotColor);
+                                svg.appendChild(dot);
+                            });
+                        } else {
+                            const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                            dot.setAttribute('cx', x);
+                            dot.setAttribute('cy', 20 + 2.5 * stringSpacing);
+                            dot.setAttribute('r', '8');
+                            dot.setAttribute('fill', dotColor);
+                            svg.appendChild(dot);
+                        }
+                    }
+                });
+
+                for (let i = 0; i < 6; i++) {
+                    const y = 20 + i * stringSpacing;
+                    const string = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    string.setAttribute('x1', '50');
+                    string.setAttribute('y1', y);
+                    string.setAttribute('x2', 50 + fretCount * fretWidth);
+                    string.setAttribute('y2', y);
+                    string.setAttribute('stroke', stringColor);
+                    string.setAttribute('stroke-width', 6 - i * 0.5);
+                    svg.appendChild(string);
+
+                    const stringLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    stringLabel.setAttribute('x', '30');
+                    stringLabel.setAttribute('y', y + 5);
+                    stringLabel.setAttribute('text-anchor', 'middle');
+                    stringLabel.setAttribute('fill', 'var(--text-primary)');
+                    stringLabel.setAttribute('font-size', '16');
+                    stringLabel.setAttribute('font-weight', 'bold');
+                    stringLabel.textContent = standardTuning[i];
+                    svg.appendChild(stringLabel);
+                }
+            }
+
+            setupNoteSelector() {
+                document.getElementById('noteSelector').onclick = () => this.showNoteModal();
+            }
+
+            showNoteModal() {
+                this.closeNoteModal();
+                const modal = document.getElementById('noteModal');
+                modal.innerHTML = '';
+
+                const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#5c6bc0';
+
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'close-modal-btn';
+                closeBtn.textContent = '×';
+                closeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    this.closeNoteModal();
+                };
+                modal.appendChild(closeBtn);
+
+                let noteList = [];
+                if (this.config.notation === 'sharps') {
+                    noteList = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                } else if (this.config.notation === 'flats') {
+                    noteList = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+                } else {
+                    noteList = ['C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B'];
+                }
+
+                noteList.forEach(note => {
+                    const option = document.createElement('div');
+                    option.className = 'modal-option';
+                    option.textContent = note;
+                    option.dataset.note = note;
+
+                    option.addEventListener('mouseenter', function() {
+                        modal.querySelectorAll('.modal-option').forEach(opt => opt.classList.remove('keyboard-focused'));
+                        this.style.backgroundColor = accentColor;
+                        this.style.color = 'white';
+                    });
+
+                    option.addEventListener('mouseleave', function() {
+                        this.style.backgroundColor = 'transparent';
+                        this.style.color = '';
+                    });
+
+                    option.onclick = (e) => {
+                        e.stopPropagation();
+                        this.selectNote(note);
+                        this.closeNoteModal();
+                    };
+
+                    modal.appendChild(option);
+                });
+
+                // Position modal below the fretboard
+                const fretboard = document.getElementById('fretboard');
+                const rect = fretboard.getBoundingClientRect();
+
+                modal.style.position = 'fixed';
+                modal.style.left = '50%';
+                modal.style.transform = 'translateX(-50%)';
+                modal.style.top = `${rect.bottom + 20}px`; // 20px below the fretboard
+
+                modal.classList.add('active');
+                modal.onclick = (e) => e.stopPropagation();
+                this.setupModalEventListeners();
+            }
+
+            setupModalEventListeners() {
+                this.boundModalClickHandler = this.handleClickOutsideModal.bind(this);
+                this.boundModalKeyHandler = this.handleModalKeyPress.bind(this);
+                document.addEventListener('click', this.boundModalClickHandler, true);
+                document.addEventListener('keydown', this.boundModalKeyHandler, true);
+            }
+
+            handleModalKeyPress(e) {
+                const modal = document.getElementById('noteModal');
+                if (!modal.classList.contains('active')) return;
+
+                const key = e.key.toUpperCase();
+
+                if (key >= 'A' && key <= 'G') {
+                    e.preventDefault();
+                    const options = Array.from(modal.querySelectorAll('.modal-option'));
+                    const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#5c6bc0';
+
+                    options.forEach(opt => {
+                        opt.classList.remove('keyboard-focused');
+                        opt.style.backgroundColor = 'transparent';
+                        opt.style.color = '';
+                    });
+
+                    const matchingOptions = options.filter(option => {
+                        const noteName = option.dataset.note;
+                        return noteName && noteName.charAt(0).toUpperCase() === key;
+                    });
+
+                    const nonMatchingOptions = options.filter(option => {
+                        const noteName = option.dataset.note;
+                        return noteName && noteName.charAt(0).toUpperCase() !== key;
+                    });
+
+                    if (matchingOptions.length > 0) {
+                        const reorderedOptions = [...matchingOptions, ...nonMatchingOptions];
+                        options.forEach(opt => opt.remove());
+                        reorderedOptions.forEach(opt => modal.appendChild(opt));
+
+                        const firstMatch = matchingOptions[0];
+                        firstMatch.classList.add('keyboard-focused');
+                        firstMatch.style.backgroundColor = accentColor;
+                        firstMatch.style.color = 'white';
+
+                        modal.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const focused = modal.querySelector('.keyboard-focused');
+                    if (focused) {
+                        this.selectNote(focused.dataset.note);
+                        this.closeNoteModal();
+                    }
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    this.closeNoteModal();
+                }
+            }
+
+            handleClickOutsideModal(e) {
+                const modal = document.getElementById('noteModal');
+                if (!modal.contains(e.target) && modal.classList.contains('active')) {
+                    this.closeNoteModal();
+                }
+            }
+
+            closeNoteModal() {
+                const modal = document.getElementById('noteModal');
+                modal.classList.remove('active');
+                modal.style.display = 'none';
+
+                if (this.boundModalClickHandler) {
+                    document.removeEventListener('click', this.boundModalClickHandler, true);
+                    this.boundModalClickHandler = null;
+                }
+                if (this.boundModalKeyHandler) {
+                    document.removeEventListener('keydown', this.boundModalKeyHandler, true);
+                    this.boundModalKeyHandler = null;
+                }
+            }
+
+            selectNote(note) {
+                this.selectedNote = note;
+                const selector = document.getElementById('noteSelector');
+                selector.textContent = note;
+                selector.classList.add('has-selection');
+                selector.classList.remove('correct', 'incorrect');
+                this.checkAnswer();
+            }
+
+            nextQuestion() {
+                const selector = document.getElementById('noteSelector');
+                selector.textContent = this.t('clickToSelect');
+                selector.classList.remove('has-selection', 'correct', 'incorrect');
+                document.getElementById('result').textContent = '';
+                document.getElementById('result').className = 'result-message';
+                this.selectedNote = null;
+
+                const svg = document.getElementById('fretboard');
+                const oldHighlight = svg.querySelector('.highlight-circle');
+                if (oldHighlight) oldHighlight.remove();
+
+                let stringIndex, fret, note;
+
+                if (this.reviewMode && this.reviewMistakes.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * this.reviewMistakes.length);
+                    const mistake = this.reviewMistakes[randomIndex];
+                    stringIndex = mistake.stringIndex;
+                    fret = mistake.fret;
+                    note = mistake.note;
+                } else if (this.reviewMode && this.reviewMistakes.length === 0) {
+                    alert(this.t('noMistakes'));
+                    this.reviewMode = false;
+                    this.showStartScreen();
+                    return;
+                } else {
+                    stringIndex = this.config.strings[Math.floor(Math.random() * this.config.strings.length)] - 1;
+                    fret = Math.floor(Math.random() * (this.config.frets + 1));
+                    const openString = standardTuning[5 - stringIndex];
+                    note = this.getNoteAtFret(openString, fret);
+                }
+
+                this.currentQuestion = { string: stringIndex + 1, fret: fret, note: note, stringIndex: stringIndex };
+
+                const fretWidth = 80;
+                const stringSpacing = 40;
+                const x = fret === 0 ? 50 : 50 + (fret - 0.5) * fretWidth;
+                const y = 20 + (5 - stringIndex) * stringSpacing;
+
+                const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                highlight.setAttribute('cx', x);
+                highlight.setAttribute('cy', y);
+                highlight.setAttribute('r', '20');
+                highlight.setAttribute('fill', 'var(--accent)');
+                highlight.setAttribute('opacity', '0.7');
+                highlight.setAttribute('class', 'highlight-circle');
+                svg.appendChild(highlight);
+
+                highlight.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+                document.getElementById('question').textContent = this.t('question');
+            }
+
+            getNoteAtFret(startNote, fret) {
+                const noteIndex = chromaticScale.findIndex(n => n.includes(startNote));
+                const targetIndex = (noteIndex + fret) % 12;
+                return chromaticScale[targetIndex];
+            }
+
+            checkAnswer() {
+                if (!this.selectedNote) return;
+
+                const userAnswer = this.selectedNote;
+                const correctNote = this.currentQuestion.note;
+                const resultDiv = document.getElementById('result');
+                const selector = document.getElementById('noteSelector');
+
+                const isCorrect = this.isEnharmonicMatch(userAnswer, correctNote);
+                this.score.total++;
+
+                if (isCorrect) {
+                    this.score.correct++;
+                    resultDiv.textContent = this.t('correct');
+                    resultDiv.className = 'result-message correct';
+                    selector.classList.remove('incorrect');
+                    selector.classList.add('correct');
+
+                    if (this.reviewMode) {
+                        this.reviewMistakes = this.reviewMistakes.filter(m =>
+                            !(m.stringIndex === this.currentQuestion.stringIndex && m.fret === this.currentQuestion.fret)
+                        );
+                    }
+
+                    setTimeout(() => this.nextQuestion(), 1500);
+                } else {
+                    resultDiv.textContent = `${this.t('incorrect')} ${this.formatNote(correctNote)}`;
+                    resultDiv.className = 'result-message incorrect';
+                    selector.classList.remove('correct');
+                    selector.classList.add('incorrect');
+
+                    // Record mistake (only in normal mode with timer, not in review mode)
+                    if (!this.reviewMode && this.timerMode) {
+                        const mistakeExists = this.mistakes.some(m =>
+                            m.stringIndex === this.currentQuestion.stringIndex && m.fret === this.currentQuestion.fret
+                        );
+                        if (!mistakeExists) {
+                            this.mistakes.push({
+                                stringIndex: this.currentQuestion.stringIndex,
+                                fret: this.currentQuestion.fret,
+                                note: this.currentQuestion.note
+                            });
+                        }
+                    }
+
+                    // In timer mode or review mode: auto-advance after 2 seconds
+                    if (this.timerMode || this.reviewMode) {
+                        this.selectedNote = null;
+                        setTimeout(() => this.nextQuestion(), 2000);
+                    } else {
+                        // In normal mode without timer: allow retry
+                        this.selectedNote = null;
+                    }
+                }
+
+                this.updateScore();
+            }
+
+            isEnharmonicMatch(userAnswer, correctNote) {
+                const enharmonicMap = {
+                    'C#': ['C#', 'Db'], 'Db': ['C#', 'Db'],
+                    'D#': ['D#', 'Eb'], 'Eb': ['D#', 'Eb'],
+                    'F#': ['F#', 'Gb'], 'Gb': ['F#', 'Gb'],
+                    'G#': ['G#', 'Ab'], 'Ab': ['G#', 'Ab'],
+                    'A#': ['A#', 'Bb'], 'Bb': ['A#', 'Bb']
+                };
+
+                if (correctNote.includes(userAnswer)) return true;
+                if (enharmonicMap[userAnswer]) {
+                    return enharmonicMap[userAnswer].some(note => correctNote.includes(note));
+                }
+                return false;
+            }
+
+            formatNote(note) {
+                if (this.config.notation === 'sharps') {
+                    return note.split('/')[0];
+                } else if (this.config.notation === 'flats') {
+                    const parts = note.split('/');
+                    return parts.length > 1 ? parts[1] : parts[0];
+                }
+                return note;
+            }
+
+            updateScore() {
+                const progress = document.getElementById('progress');
+                const percentage = this.score.total > 0 ? Math.round((this.score.correct / this.score.total) * 100) : 0;
+                let scoreText = `${this.t('score')}: ${this.score.correct}/${this.score.total} (${percentage}%)`;
+
+                if (this.reviewMode) {
+                    scoreText = `🔄 ${this.t('reviewMode')}: ${scoreText} | ${this.t('reviewModeDesc')} (${this.reviewMistakes.length})`;
+                } else if (this.timerMode && this.mistakes.length > 0) {
+                    scoreText += ` | ❌ ${this.mistakes.length}`;
+                }
+
+                progress.textContent = scoreText;
+            }
+        }
+
+        const App = new FretboardTrainer();
+    </script>
+</body>
+</html>
