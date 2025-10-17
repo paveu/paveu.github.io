@@ -129,6 +129,41 @@
             transform: translateX(-3px);
         }
 
+        /* Language switcher */
+        .language-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 5px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 5px;
+            z-index: 1000;
+        }
+
+        .language-switcher button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            font-size: 0.9em;
+        }
+
+        .language-switcher button:hover {
+            background: var(--hover-bg);
+        }
+
+        .language-switcher button.active {
+            background: var(--accent);
+            color: white;
+        }
+
         /* Start screen */
         #startScreen {
             max-width: 600px;
@@ -725,6 +760,33 @@
             align-items: center;
         }
 
+        /* Quiz mode highlight */
+        .drop-zone.quiz-active {
+            border-color: var(--accent);
+            border-width: 3px;
+            border-style: solid;
+            animation: quiz-pulse 2s infinite;
+        }
+
+        .drop-zone.quiz-active:not(.incorrect) {
+            background: var(--hover-bg);
+        }
+
+        @keyframes quiz-pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(92, 107, 192, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(92, 107, 192, 0);
+            }
+        }
+
+        .drop-zone.quiz-disabled {
+            opacity: 0.3;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -783,6 +845,17 @@
                 display: none;
             }
 
+            .language-switcher {
+                top: 10px;
+                right: 10px;
+                padding: 3px;
+            }
+
+            .language-switcher button {
+                padding: 6px 12px;
+                font-size: 0.8em;
+            }
+
             th .full-text {
                 display: none;
             }
@@ -832,6 +905,12 @@
 </head>
 <body>
     <div class="container">
+        <!-- Language Switcher -->
+        <div class="language-switcher">
+            <button id="langPL" class="active" onclick="App.setLanguage('pl')">PL</button>
+            <button id="langEN" onclick="App.setLanguage('en')">EN</button>
+        </div>
+
         <!-- Start screen -->
         <div id="startScreen">
             <a href="https://paveu.pl" class="back-to-home">← Back to paveu.pl</a>
@@ -852,6 +931,20 @@
                     <div id="scaleCheckboxes">
                         <div></div>
                     </div>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3>Practice Mode</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="practice-mode" value="free" checked>
+                        <span>Free Practice - Fill any cells</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="practice-mode" value="quiz">
+                        <span>Quiz Mode - Fill one random cell at a time</span>
+                    </label>
                 </div>
             </div>
 
@@ -892,9 +985,7 @@
                     </label>
                     <label class="radio-option">
                         <input type="radio" name="timer-mode" value="custom">
-                        <span>Number of minutes:</span>
-                        <input type="number" id="timerMinutes" min="1" max="120" value="10"
-                               style="margin-left: 10px; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); width: 80px;">
+                        <span>Number of minutes: <input type="number" id="timerMinutes" min="1" max="120" value="10" style="margin-left: 10px; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); width: 80px;"></span>
                     </label>
                 </div>
             </div>
@@ -913,7 +1004,7 @@
                 </div>
             </div>
 
-            <button class="start-button" onclick="startApp()">START</button>
+            <button class="start-button" onclick="App.startApp()">START</button>
 
             <div class="features-section">
                 <h3>✨ Features</h3>
@@ -937,13 +1028,13 @@
             <h1>🎵 The Major Key Chords Chart</h1>
 
             <div class="controls">
-                <button class="btn" onclick="showStartScreen()">← Menu</button>
-                <button class="btn" onclick="resetApp()">🔄 Reset</button>
+                <button class="btn" onclick="App.showStartScreen()">← Menu</button>
+                <button class="btn" onclick="App.resetApp()">🔄 Reset</button>
                 <div id="timerDisplay" class="timer-display" style="display: none;">
                     ⏱️ <span id="timerText">00:00</span>
                 </div>
                 <div class="progress" id="progress"></div>
-                <button class="btn" id="checkBtn" onclick="checkAllAnswers()">✓ Check</button>
+                <button class="btn" id="checkBtn" onclick="App.checkAllAnswers()">✓ Check</button>
             </div>
 
             <div class="main-content">
@@ -966,7 +1057,7 @@
 
     <script>
         // Scale data with chords (triads) and accidentals
-        const scales = {
+        const scalesData = {
             'C': {chords: ['C', 'Dm', 'Em', 'F', 'G', 'Am', 'Bdim'], accidentals: '0'},
             'G': {chords: ['G', 'Am', 'Bm', 'C', 'D', 'Em', 'F#dim'], accidentals: '1#'},
             'D': {chords: ['D', 'Em', 'F#m', 'G', 'A', 'Bm', 'C#dim'], accidentals: '2#'},
@@ -1019,925 +1110,1532 @@
             ]
         ];
 
-        // Application state
-        let config = {
-            mode: 'all',
-            selectedScales: [],
-            difficulty: 'all',
-            validation: 'instant',
-            theme: 'dark-minimal',
-            timer: 0
+        // CSS Classes constants
+        const CSS_CLASSES = {
+            FILLED: 'filled',
+            CORRECT: 'correct',
+            INCORRECT: 'incorrect',
+            DRAGGING: 'dragging',
+            DRAG_OVER: 'drag-over',
+            KEYBOARD_FOCUSED: 'keyboard-focused',
+            HAS_CHORDS: 'has-chords',
+            ACTIVE: 'active'
         };
 
-        let userAnswers = {};
-        let draggedChord = null;
-        let currentDropZone = null;
-        let timerInterval = null;
-        let timerSeconds = 0;
-
-        // Initialization
-        document.addEventListener('DOMContentLoaded', () => {
-            populateScaleCheckboxes();
-            setupStartScreenListeners();
-
-            const modeRadio = document.querySelector('input[name="mode"]:checked');
-            if (modeRadio && modeRadio.value === 'custom') {
-                document.getElementById('scaleCheckboxes').style.display = 'block';
+        // Translations
+        const translations = {
+            pl: {
+                title: '🎵 Tabela Akordów w Tonacji Durowej',
+                backToHome: '← Powrót do paveu.pl',
+                exerciseMode: 'Tryb ćwiczenia',
+                allScales: 'Wszystkie gamy (15 gam)',
+                selectScales: 'Wybierz gamy do ćwiczenia',
+                practiceMode: 'Tryb praktyki',
+                freePractice: 'Swobodne ćwiczenie - Wypełnij dowolne komórki',
+                quizMode: 'Tryb quiz - Wypełniaj po jednej losowej komórce',
+                difficultyLevel: 'Poziom trudności',
+                allChords: 'Wszystkie akordy',
+                onlySelectedChords: 'Tylko akordy z wybranych gam',
+                validationMode: 'Tryb walidacji',
+                instantValidation: 'Walidacja natychmiastowa',
+                manualValidation: 'Walidacja manualna',
+                practiceTimer: 'Timer ćwiczeń',
+                noTimer: 'Bez timera',
+                numberOfMinutes: 'Liczba minut:',
+                theme: 'Motyw',
+                lightMinimal: 'Jasny minimalny',
+                darkMinimal: 'Ciemny minimalny',
+                start: 'START',
+                features: '✨ Funkcje',
+                feature1: '<strong>15 Gam Durowych</strong> - Ćwicz wszystkie gamy durowe od C do Cb',
+                feature2: '<strong>Przeciągnij i upuść</strong> - Przeciągaj akordy z banku lub klikaj komórki',
+                feature3: '<strong>Nawigacja klawiaturą</strong> - Naciśnij klawisz literowy, aby przejść do akordu',
+                feature4: '<strong>Własne ćwiczenia</strong> - Wybierz konkretne gamy lub ćwicz wszystkie naraz',
+                feature5: '<strong>Inteligentna walidacja</strong> - Natychmiastowa informacja zwrotna lub sprawdzanie manualne',
+                feature6: '<strong>Kolorowe kolumny</strong> - I/IV/V (czerwony), II/III/VI (niebieski), VII (zielony)',
+                feature7: '<strong>Szybki reset</strong> - Wyczyść pojedyncze komórki, całe gamy lub wszystkie naraz',
+                feature8: '<strong>Dwa motywy</strong> - Jasny i ciemny tryb minimalny',
+                menu: '← Menu',
+                reset: '🔄 Reset',
+                check: '✓ Sprawdź',
+                chordBank: 'Bank akordów (Przeciągnij i upuść)',
+                scale: 'Gama',
+                scaleShort: 'G',
+                numAccidentals: 'Liczba #/b',
+                tonic: 'Tonika',
+                tonicShort: 'To',
+                supertonic: 'Supertonika',
+                supertonicShort: 'Su',
+                mediant: 'Medianta',
+                mediantShort: 'Me',
+                subdominant: 'Subdominanta',
+                subdominantShort: 'Sd',
+                dominant: 'Dominanta',
+                dominantShort: 'Do',
+                submediant: 'Submedianta',
+                submediantShort: 'Sm',
+                leadingTone: 'Dźwięk prowadzący',
+                leadingToneShort: 'DP',
+                unison: 'Pryma',
+                unisonShort: 'P',
+                octave: 'Oktawa P',
+                octaveShort: 'OP',
+                major: 'Durowy',
+                majorShort: 'Dur',
+                minor: 'Molowy',
+                minorShort: 'Mol',
+                diminished: 'Zmniejszony',
+                diminishedShort: 'Zm',
+                filled: 'Wypełnione',
+                correct: 'Poprawne',
+                congratulations: '🎉 Gratulacje! Wszystkie odpowiedzi są poprawne!',
+                selectAtLeastOne: 'Proszę wybrać przynajmniej jedną gamę!',
+                validMinutes: 'Proszę podać prawidłową liczbę minut (1-120)',
+                timeUp: '⏰ Czas minął! Sesja ćwiczeń zakończona.',
+                resetConfirm: 'Reset zrestartuje timer. Kontynuować?',
+                clearRowTitle: 'Wyczyść wszystkie akordy w tej gamie'
+            },
+            en: {
+                title: '🎵 The Major Key Chords Chart',
+                backToHome: '← Back to paveu.pl',
+                exerciseMode: 'Exercise Mode',
+                allScales: 'All scales (15 scales)',
+                selectScales: 'Select scales to practice',
+                practiceMode: 'Practice Mode',
+                freePractice: 'Free Practice - Fill any cells',
+                quizMode: 'Quiz Mode - Fill one random cell at a time',
+                difficultyLevel: 'Difficulty Level',
+                allChords: 'All chords',
+                onlySelectedChords: 'Only chords from selected scales',
+                validationMode: 'Validation Mode',
+                instantValidation: 'Instant validation',
+                manualValidation: 'Manual validation',
+                practiceTimer: 'Practice Timer',
+                noTimer: 'No timer',
+                numberOfMinutes: 'Number of minutes:',
+                theme: 'Theme',
+                lightMinimal: 'Light Minimal',
+                darkMinimal: 'Dark Minimal',
+                start: 'START',
+                features: '✨ Features',
+                feature1: '<strong>15 Major Scales</strong> - Practice all major scales from C to Cb',
+                feature2: '<strong>Drag & Drop</strong> - Drag chords from the bank or click cells to select',
+                feature3: '<strong>Keyboard Navigation</strong> - Press letter keys to jump to chords in dropdown',
+                feature4: '<strong>Custom Practice</strong> - Choose specific scales or practice all at once',
+                feature5: '<strong>Smart Validation</strong> - Instant feedback or manual checking',
+                feature6: '<strong>Color-Coded Columns</strong> - I/IV/V (red), II/III/VI (blue), VII (green)',
+                feature7: '<strong>Quick Reset</strong> - Clear individual cells, entire scales, or all at once',
+                feature8: '<strong>Two Themes</strong> - Light and dark minimal modes',
+                menu: '← Menu',
+                reset: '🔄 Reset',
+                check: '✓ Check',
+                chordBank: 'Chord Bank (Drag & Drop)',
+                scale: 'Scale',
+                scaleShort: 'S',
+                numAccidentals: 'Num #/b',
+                tonic: 'Tonic',
+                tonicShort: 'To',
+                supertonic: 'Supertonic',
+                supertonicShort: 'Su',
+                mediant: 'Mediant',
+                mediantShort: 'Me',
+                subdominant: 'Subdominant',
+                subdominantShort: 'Sd',
+                dominant: 'Dominant',
+                dominantShort: 'Do',
+                submediant: 'Submediant',
+                submediantShort: 'Sm',
+                leadingTone: 'Leading Tone',
+                leadingToneShort: 'LT',
+                unison: 'Unison',
+                unisonShort: 'U',
+                octave: 'Octave S',
+                octaveShort: 'OS',
+                major: 'Major',
+                majorShort: 'Ma',
+                minor: 'Minor',
+                minorShort: 'Mi',
+                diminished: 'Dim',
+                diminishedShort: 'Di',
+                filled: 'Filled',
+                correct: 'Correct',
+                congratulations: '🎉 Congratulations! All answers are correct!',
+                selectAtLeastOne: 'Please select at least one scale!',
+                validMinutes: 'Please enter a valid number of minutes (1-120)',
+                timeUp: '⏰ Time is up! Practice session completed.',
+                resetConfirm: 'Reset will restart the timer. Continue?',
+                clearRowTitle: 'Clear all chords in this scale'
             }
+        };
 
-            const themeRadio = document.querySelector('input[name="theme"]:checked');
-            if (themeRadio) {
-                document.documentElement.setAttribute('data-theme', themeRadio.value);
-            } else {
-                document.documentElement.setAttribute('data-theme', 'dark-minimal');
-            }
-        });
+        // Main application class
+        class MusicTheoryApp {
+            constructor() {
+                // Constants
+                this.MODAL_HEIGHT = 350;
+                this.MODAL_CLOSE_BTN_HEIGHT = 40;
+                this.TIMER_WARNING_THRESHOLD = 180; // 3 minutes
+                this.TIMER_DANGER_THRESHOLD = 60; // 1 minute
+                this.MARGIN = 10;
 
-        function populateScaleCheckboxes() {
-            const container = document.querySelector('#scaleCheckboxes > div');
-            Object.keys(scales).forEach(scale => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'scale-checkbox';
-
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.id = 'scale-' + scale;
-                checkbox.value = scale;
-
-                const label = document.createElement('label');
-                label.htmlFor = 'scale-' + scale;
-                label.textContent = scale;
-
-                wrapper.appendChild(checkbox);
-                wrapper.appendChild(label);
-                wrapper.addEventListener('click', (e) => {
-                    if (e.target !== checkbox) {
-                        checkbox.checked = !checkbox.checked;
-                    }
-                });
-
-                container.appendChild(wrapper);
-            });
-        }
-
-        function setupStartScreenListeners() {
-            document.querySelectorAll('input[name="mode"]').forEach(radio => {
-                radio.addEventListener('change', (e) => {
-                    const checkboxContainer = document.getElementById('scaleCheckboxes');
-                    checkboxContainer.style.display = e.target.value === 'custom' ? 'block' : 'none';
-                });
-            });
-
-            document.querySelectorAll('input[name="theme"]').forEach(radio => {
-                radio.addEventListener('change', (e) => {
-                    document.documentElement.setAttribute('data-theme', e.target.value);
-                });
-            });
-        }
-
-        function startApp() {
-            config.mode = document.querySelector('input[name="mode"]:checked').value;
-
-            if (config.mode === 'custom') {
-                const checkboxes = document.querySelectorAll('#scaleCheckboxes input[type="checkbox"]:checked');
-                config.selectedScales = Array.from(checkboxes).map(cb => cb.value);
-
-                if (config.selectedScales.length === 0) {
-                    alert('Please select at least one scale!');
-                    return;
-                }
-            } else {
-                config.selectedScales = Object.keys(scales);
-            }
-
-            config.difficulty = document.querySelector('input[name="difficulty"]:checked').value;
-            config.validation = document.querySelector('input[name="validation"]:checked').value;
-            config.theme = document.querySelector('input[name="theme"]:checked').value;
-
-            // Get timer configuration
-            const timerMode = document.querySelector('input[name="timer-mode"]:checked').value;
-            if (timerMode === 'custom') {
-                const timerMinutes = parseInt(document.getElementById('timerMinutes').value);
-                if (timerMinutes < 1 || timerMinutes > 120) {
-                    alert('Please enter a valid number of minutes (1-120)');
-                    return;
-                }
-                config.timer = timerMinutes;
-            } else {
-                config.timer = 0;
-            }
-
-            document.documentElement.setAttribute('data-theme', config.theme);
-
-            const checkBtn = document.getElementById('checkBtn');
-            if (config.validation === 'manual') {
-                checkBtn.style.display = 'inline-block';
-            } else {
-                checkBtn.style.display = 'none';
-            }
-
-            // Setup timer if selected
-            const timerDisplay = document.getElementById('timerDisplay');
-            if (config.timer > 0) {
-                timerDisplay.style.display = 'inline-flex';
-                startTimer(config.timer);
-            } else {
-                timerDisplay.style.display = 'none';
-            }
-
-            document.getElementById('startScreen').style.display = 'none';
-            document.getElementById('mainScreen').style.display = 'block';
-
-            buildChordBank();
-            buildTable();
-            updateProgress();
-        }
-
-        function startTimer(minutes) {
-            timerSeconds = minutes * 60;
-            updateTimerDisplay();
-
-            if (timerInterval) {
-                clearInterval(timerInterval);
-            }
-
-            timerInterval = setInterval(() => {
-                timerSeconds--;
-                updateTimerDisplay();
-
-                if (timerSeconds <= 0) {
-                    clearInterval(timerInterval);
-                    timerInterval = null;
-                    alert('⏰ Time is up! Practice session completed.');
-                }
-            }, 1000);
-        }
-
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timerSeconds / 60);
-            const seconds = timerSeconds % 60;
-            const timeText = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-
-            const timerText = document.getElementById('timerText');
-            const timerDisplay = document.getElementById('timerDisplay');
-
-            timerText.textContent = timeText;
-
-            // Change color based on remaining time
-            timerDisplay.classList.remove('warning', 'danger');
-            if (timerSeconds <= 60) {
-                timerDisplay.classList.add('danger');
-            } else if (timerSeconds <= 180) {
-                timerDisplay.classList.add('warning');
-            }
-        }
-
-        function showStartScreen() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-            }
-            document.getElementById('mainScreen').style.display = 'none';
-            document.getElementById('startScreen').style.display = 'block';
-            resetApp();
-        }
-
-        function buildChordBank() {
-            const bank = document.getElementById('chordBank');
-            bank.innerHTML = '';
-
-            let chords = [];
-
-            if (config.difficulty === 'all') {
-                Object.values(scales).forEach(scale => {
-                    chords = chords.concat(scale.chords);
-                });
-                chords = [...new Set(chords)];
-            } else {
-                config.selectedScales.forEach(scaleName => {
-                    chords = chords.concat(scales[scaleName].chords);
-                });
-                chords = [...new Set(chords)];
-            }
-
-            const chordGroups = {
-                'A': [], 'B': [], 'C': [], 'D': [], 'E': [], 'F': [], 'G': []
-            };
-
-            chords.forEach(chord => {
-                const baseNote = chord.charAt(0);
-                if (chordGroups[baseNote]) {
-                    chordGroups[baseNote].push(chord);
-                }
-            });
-
-            ['A', 'B', 'C', 'D', 'E', 'F', 'G'].forEach(note => {
-                if (chordGroups[note].length > 0) {
-                    chordGroups[note].sort();
-
-                    const groupDiv = document.createElement('div');
-                    groupDiv.className = 'chord-group';
-
-                    const label = document.createElement('div');
-                    label.className = 'chord-group-label';
-                    label.textContent = note + ':';
-                    groupDiv.appendChild(label);
-
-                    const rowDiv = document.createElement('div');
-                    rowDiv.className = 'chord-row';
-
-                    chordGroups[note].forEach(chord => {
-                        const chordEl = document.createElement('div');
-                        chordEl.className = 'chord';
-                        chordEl.textContent = chord;
-                        chordEl.draggable = true;
-                        chordEl.dataset.chord = chord;
-
-                        chordEl.addEventListener('dragstart', handleDragStart);
-                        chordEl.addEventListener('dragend', handleDragEnd);
-
-                        rowDiv.appendChild(chordEl);
-                    });
-
-                    groupDiv.appendChild(rowDiv);
-                    bank.appendChild(groupDiv);
-                }
-            });
-        }
-
-        function buildTable() {
-            const table = document.getElementById('scalesTable');
-            table.innerHTML = '';
-
-            const thead = document.createElement('thead');
-
-            headerRows.forEach((row, index) => {
-                const headerRow = document.createElement('tr');
-                headerRow.className = 'header-row-' + (index + 1);
-
-                const scaleHeader = document.createElement('th');
-                scaleHeader.rowSpan = index === 0 ? 4 : 1;
-                if (index === 0) {
-                    const fullSpan = document.createElement('span');
-                    fullSpan.className = 'full-text';
-                    fullSpan.textContent = 'Scale';
-
-                    const shortSpan = document.createElement('span');
-                    shortSpan.className = 'mobile-short';
-                    shortSpan.textContent = 'S';
-                    shortSpan.dataset.fullText = 'Scale';
-                    shortSpan.addEventListener('click', showTooltip);
-
-                    scaleHeader.appendChild(fullSpan);
-                    scaleHeader.appendChild(shortSpan);
-                    headerRow.appendChild(scaleHeader);
-                } else if (index > 0) {
-                    scaleHeader.textContent = '';
-                }
-
-                row.forEach((header, i) => {
-                    const th = document.createElement('th');
-
-                    // Handle objects with full and short text
-                    if (typeof header === 'object' && header.full) {
-                        const fullSpan = document.createElement('span');
-                        fullSpan.className = 'full-text';
-                        fullSpan.textContent = header.full;
-
-                        const shortSpan = document.createElement('span');
-                        shortSpan.className = 'mobile-short';
-                        shortSpan.textContent = header.short;
-                        shortSpan.dataset.fullText = header.full;
-                        shortSpan.addEventListener('click', showTooltip);
-
-                        th.appendChild(fullSpan);
-                        th.appendChild(shortSpan);
-                    } else {
-                        th.textContent = header;
-                    }
-
-                    if (index === 0 && i < 7) {
-                        th.className = 'degree-' + (i + 1);
-
-                        if (i === 0 || i === 3 || i === 4) {
-                            th.classList.add('col-primary');
-                        } else if (i === 1 || i === 2 || i === 5) {
-                            th.classList.add('col-secondary');
-                        } else if (i === 6) {
-                            th.classList.add('col-diminished');
-                        }
-                    }
-
-                    headerRow.appendChild(th);
-                });
-
-                thead.appendChild(headerRow);
-            });
-
-            table.appendChild(thead);
-
-            const tbody = document.createElement('tbody');
-
-            const scalesToShow = config.selectedScales;
-
-            scalesToShow.forEach(scale => {
-                const row = document.createElement('tr');
-                row.dataset.scale = scale;
-
-                const scaleCell = document.createElement('td');
-                scaleCell.className = 'scale-cell';
-
-                const scaleName = document.createElement('span');
-                scaleName.textContent = scale;
-                scaleCell.appendChild(scaleName);
-
-                const clearRowBtn = document.createElement('button');
-                clearRowBtn.className = 'clear-row-btn';
-                clearRowBtn.textContent = '×';
-                clearRowBtn.title = 'Clear all chords in this scale';
-                clearRowBtn.onclick = function(e) {
-                    e.stopPropagation();
-                    clearScaleRow(row);
+                this.config = {
+                    mode: 'all',
+                    selectedScales: [],
+                    difficulty: 'all',
+                    validation: 'instant',
+                    theme: 'dark-minimal',
+                    timer: 0,
+                    language: 'pl',
+                    practiceMode: 'free'
                 };
-                scaleCell.appendChild(clearRowBtn);
 
-                row.appendChild(scaleCell);
+                this.userAnswers = {};
+                this.draggedChord = null;
+                this.currentDropZone = null;
+                this.timerInterval = null;
+                this.timerSeconds = 0;
 
-                for (let degree = 0; degree < 7; degree++) {
-                    const cell = document.createElement('td');
+                // Quiz mode properties
+                this.quizMode = {
+                    active: false,
+                    currentCell: null,
+                    availableCells: []
+                };
 
-                    if (degree === 0 || degree === 3 || degree === 4) {
-                        cell.classList.add('cell-primary');
-                    } else if (degree === 1 || degree === 2 || degree === 5) {
-                        cell.classList.add('cell-secondary');
-                    } else if (degree === 6) {
-                        cell.classList.add('cell-diminished');
+                // Bound event handlers for modal
+                this.boundModalClickHandler = null;
+                this.boundModalKeyHandler = null;
+
+                // DOM elements
+                this.elements = {
+                    startScreen: document.getElementById('startScreen'),
+                    mainScreen: document.getElementById('mainScreen'),
+                    chordBank: document.getElementById('chordBank'),
+                    scalesTable: document.getElementById('scalesTable'),
+                    scaleCheckboxes: document.getElementById('scaleCheckboxes'),
+                    timerDisplay: document.getElementById('timerDisplay'),
+                    timerText: document.getElementById('timerText'),
+                    chordModal: document.getElementById('chordModal'),
+                    progress: document.getElementById('progress'),
+                    checkBtn: document.getElementById('checkBtn')
+                };
+
+                this.init();
+            }
+
+            // Get current translation
+            t(key) {
+                return translations[this.config.language][key] || key;
+            }
+
+            // Set language
+            setLanguage(lang) {
+                this.config.language = lang;
+
+                // Update language buttons
+                document.getElementById('langPL').classList.toggle('active', lang === 'pl');
+                document.getElementById('langEN').classList.toggle('active', lang === 'en');
+
+                // Update all text on the page
+                this.updateTranslations();
+            }
+
+            // Update all translations on the page
+            updateTranslations() {
+                // Update titles
+                document.querySelectorAll('h1').forEach(el => {
+                    el.textContent = this.t('title');
+                });
+
+                // Update back to home links
+                document.querySelectorAll('.back-to-home').forEach(el => {
+                    el.textContent = this.t('backToHome');
+                });
+
+                // Update start screen
+                const configSections = document.querySelectorAll('.config-section h3');
+                if (configSections[0]) configSections[0].textContent = this.t('exerciseMode');
+                if (configSections[1]) configSections[1].textContent = this.t('practiceMode');
+                if (configSections[2]) configSections[2].textContent = this.t('difficultyLevel');
+                if (configSections[3]) configSections[3].textContent = this.t('validationMode');
+                if (configSections[4]) configSections[4].textContent = this.t('practiceTimer');
+                if (configSections[5]) configSections[5].textContent = this.t('theme');
+
+                // Update radio options
+                const radioLabels = document.querySelectorAll('.radio-option span');
+                if (radioLabels[0]) radioLabels[0].textContent = this.t('allScales');
+                if (radioLabels[1]) radioLabels[1].textContent = this.t('selectScales');
+                if (radioLabels[2]) radioLabels[2].textContent = this.t('freePractice');
+                if (radioLabels[3]) radioLabels[3].textContent = this.t('quizMode');
+                if (radioLabels[4]) radioLabels[4].textContent = this.t('allChords');
+                if (radioLabels[5]) radioLabels[5].textContent = this.t('onlySelectedChords');
+                if (radioLabels[6]) radioLabels[6].textContent = this.t('instantValidation');
+                if (radioLabels[7]) radioLabels[7].textContent = this.t('manualValidation');
+                if (radioLabels[8]) radioLabels[8].textContent = this.t('noTimer');
+                if (radioLabels[9]) {
+                    // Find the text before the input and update only that
+                    const span = radioLabels[9];
+                    const input = span.querySelector('#timerMinutes');
+                    if (input) {
+                        // Clear and rebuild with translated text + existing input
+                        const inputValue = input.value;
+                        span.textContent = this.t('numberOfMinutes') + ' ';
+                        input.value = inputValue; // Restore value
+                        span.appendChild(input);
+                    }
+                }
+                if (radioLabels[10]) radioLabels[10].textContent = this.t('lightMinimal');
+                if (radioLabels[11]) radioLabels[11].textContent = this.t('darkMinimal');
+
+                // Update start button
+                document.querySelector('.start-button').textContent = this.t('start');
+
+                // Update features section
+                document.querySelector('.features-section h3').textContent = this.t('features');
+                const featureItems = document.querySelectorAll('.features-list li');
+                if (featureItems[0]) featureItems[0].innerHTML = this.t('feature1');
+                if (featureItems[1]) featureItems[1].innerHTML = this.t('feature2');
+                if (featureItems[2]) featureItems[2].innerHTML = this.t('feature3');
+                if (featureItems[3]) featureItems[3].innerHTML = this.t('feature4');
+                if (featureItems[4]) featureItems[4].innerHTML = this.t('feature5');
+                if (featureItems[5]) featureItems[5].innerHTML = this.t('feature6');
+                if (featureItems[6]) featureItems[6].innerHTML = this.t('feature7');
+                if (featureItems[7]) featureItems[7].innerHTML = this.t('feature8');
+
+                // Update main screen buttons
+                const buttons = document.querySelectorAll('#mainScreen .btn');
+                if (buttons[0]) buttons[0].textContent = this.t('menu');
+                if (buttons[1]) buttons[1].textContent = this.t('reset');
+
+                const checkBtn = document.getElementById('checkBtn');
+                if (checkBtn) checkBtn.textContent = this.t('check');
+
+                // Update chord bank title
+                const chordBankTitle = document.querySelector('.chord-bank h3');
+                if (chordBankTitle) chordBankTitle.textContent = this.t('chordBank');
+
+                // Rebuild table if it exists (to update headers)
+                if (this.elements.mainScreen.style.display === 'block') {
+                    this.buildTable();
+                    this.updateProgress();
+                }
+            }
+
+            // Initialize the application
+            init() {
+                try {
+                    this.populateScaleCheckboxes();
+                    this.setupStartScreenListeners();
+
+                    // Set initial theme
+                    const themeRadio = document.querySelector('input[name="theme"]:checked');
+                    if (themeRadio) {
+                        document.documentElement.setAttribute('data-theme', themeRadio.value);
+                    } else {
+                        document.documentElement.setAttribute('data-theme', 'dark-minimal');
                     }
 
-                    const dropZone = document.createElement('div');
-                    dropZone.className = 'drop-zone';
-                    dropZone.dataset.scale = scale;
-                    dropZone.dataset.degree = degree;
+                    // Setup event delegation for better performance
+                    this.setupEventDelegation();
 
-                    const removeBtn = document.createElement('button');
-                    removeBtn.className = 'remove-btn';
-                    removeBtn.textContent = '×';
-                    removeBtn.onclick = function(e) {
-                        e.stopPropagation();
-                        removeChordFromCell(dropZone);
-                    };
+                    // Initialize with Polish language
+                    this.updateTranslations();
+                } catch (error) {
+                    console.error('Initialization error:', error);
+                }
+            }
 
-                    dropZone.appendChild(removeBtn);
+            // Populate scale checkboxes in the start screen
+            populateScaleCheckboxes() {
+                const container = this.elements.scaleCheckboxes.querySelector('div');
+                Object.keys(scalesData).forEach(scale => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'scale-checkbox';
 
-                    dropZone.addEventListener('dragover', handleDragOver);
-                    dropZone.addEventListener('dragleave', handleDragLeave);
-                    dropZone.addEventListener('drop', handleDrop);
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = 'scale-' + scale;
+                    checkbox.value = scale;
 
-                    dropZone.addEventListener('click', function(e) {
-                        if (!this.classList.contains('filled')) {
-                            showChordDropdown(this);
+                    const label = document.createElement('label');
+                    label.htmlFor = 'scale-' + scale;
+                    label.textContent = scale;
+
+                    wrapper.appendChild(checkbox);
+                    wrapper.appendChild(label);
+                    wrapper.addEventListener('click', (e) => {
+                        if (e.target !== checkbox) {
+                            checkbox.checked = !checkbox.checked;
                         }
                     });
 
-                    cell.appendChild(dropZone);
-                    row.appendChild(cell);
+                    container.appendChild(wrapper);
+                });
+            }
+
+            // Setup event listeners for the start screen
+            setupStartScreenListeners() {
+                document.querySelectorAll('input[name="mode"]').forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        this.elements.scaleCheckboxes.style.display = e.target.value === 'custom' ? 'block' : 'none';
+                    });
+                });
+
+                document.querySelectorAll('input[name="theme"]').forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        document.documentElement.setAttribute('data-theme', e.target.value);
+                    });
+                });
+
+                // Handle practice mode changes
+                document.querySelectorAll('input[name="practice-mode"]').forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        const isQuizMode = e.target.value === 'quiz';
+                        const manualValidationRadio = document.querySelector('input[name="validation"][value="manual"]');
+                        const manualValidationOption = manualValidationRadio?.closest('.radio-option');
+
+                        if (isQuizMode) {
+                            // Disable manual validation in quiz mode
+                            if (manualValidationRadio) {
+                                manualValidationRadio.disabled = true;
+                            }
+                            if (manualValidationOption) {
+                                manualValidationOption.style.opacity = '0.5';
+                                manualValidationOption.style.cursor = 'not-allowed';
+                                manualValidationOption.style.pointerEvents = 'none';
+                            }
+
+                            // Switch to instant validation
+                            const instantValidationRadio = document.querySelector('input[name="validation"][value="instant"]');
+                            if (instantValidationRadio) {
+                                instantValidationRadio.checked = true;
+                            }
+                        } else {
+                            // Enable manual validation in free mode
+                            if (manualValidationRadio) {
+                                manualValidationRadio.disabled = false;
+                            }
+                            if (manualValidationOption) {
+                                manualValidationOption.style.opacity = '1';
+                                manualValidationOption.style.cursor = 'pointer';
+                                manualValidationOption.style.pointerEvents = 'auto';
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Setup event delegation for better performance
+            setupEventDelegation() {
+                // Event delegation for radio options
+                document.addEventListener('click', (e) => {
+                    const radioOption = e.target.closest('.radio-option');
+                    if (radioOption) {
+                        const radio = radioOption.querySelector('input[type="radio"]');
+                        if (radio) {
+                            radio.checked = true;
+                            radio.dispatchEvent(new Event('change'));
+                        }
+                    }
+                });
+            }
+
+            // Start the application based on user configuration
+            startApp() {
+                try {
+                    // Get configuration from UI
+                    this.config.mode = document.querySelector('input[name="mode"]:checked').value;
+
+                    if (this.config.mode === 'custom') {
+                        const checkboxes = document.querySelectorAll('#scaleCheckboxes input[type="checkbox"]:checked');
+                        this.config.selectedScales = Array.from(checkboxes).map(cb => cb.value);
+
+                        if (this.config.selectedScales.length === 0) {
+                            alert(this.t('selectAtLeastOne'));
+                            return;
+                        }
+                    } else {
+                        this.config.selectedScales = Object.keys(scalesData);
+                    }
+
+                    this.config.difficulty = document.querySelector('input[name="difficulty"]:checked').value;
+                    this.config.validation = document.querySelector('input[name="validation"]:checked').value;
+                    this.config.theme = document.querySelector('input[name="theme"]:checked').value;
+                    this.config.practiceMode = document.querySelector('input[name="practice-mode"]:checked').value;
+
+                    // Get timer configuration
+                    const timerMode = document.querySelector('input[name="timer-mode"]:checked').value;
+                    if (timerMode === 'custom') {
+                        const timerMinutes = parseInt(document.getElementById('timerMinutes').value);
+                        if (isNaN(timerMinutes) || timerMinutes < 1 || timerMinutes > 120) {
+                            alert(this.t('validMinutes'));
+                            return;
+                        }
+                        this.config.timer = timerMinutes;
+                    } else {
+                        this.config.timer = 0;
+                    }
+
+                    // Set theme
+                    document.documentElement.setAttribute('data-theme', this.config.theme);
+
+                    // Configure check button visibility
+                    this.elements.checkBtn.style.display = this.config.validation === 'manual' ? 'inline-block' : 'none';
+
+                    // Setup timer if selected
+                    if (this.config.timer > 0) {
+                        this.elements.timerDisplay.style.display = 'inline-flex';
+                        this.startTimer(this.config.timer);
+                    } else {
+                        this.elements.timerDisplay.style.display = 'none';
+                    }
+
+                    // Switch to main screen
+                    this.elements.startScreen.style.display = 'none';
+                    this.elements.mainScreen.style.display = 'block';
+
+                    // Build the application interface
+                    this.buildChordBank();
+                    this.buildTable();
+                    this.updateProgress();
+
+                    // Initialize quiz mode if selected
+                    if (this.config.practiceMode === 'quiz') {
+                        this.initQuizMode();
+                    }
+                } catch (error) {
+                    console.error('Error starting app:', error);
+                    alert('An error occurred while starting the application. Please try again.');
                 }
-
-                const infoCell = document.createElement('td');
-                infoCell.textContent = scales[scale].accidentals;
-                infoCell.className = 'info-cell';
-                row.appendChild(infoCell);
-
-                tbody.appendChild(row);
-            });
-
-            table.appendChild(tbody);
-
-            userAnswers = {};
-        }
-
-        function handleDragStart(e) {
-            draggedChord = e.target.dataset.chord;
-            e.target.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/html', e.target.innerHTML);
-        }
-
-        function handleDragEnd(e) {
-            e.target.classList.remove('dragging');
-        }
-
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-            e.target.classList.add('drag-over');
-        }
-
-        function handleDragLeave(e) {
-            e.target.classList.remove('drag-over');
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            e.target.classList.remove('drag-over');
-
-            let dropZone = e.target;
-
-            if (dropZone.classList.contains('remove-btn')) {
-                dropZone = dropZone.parentElement;
             }
 
-            const scale = dropZone.dataset.scale;
-            const degree = parseInt(dropZone.dataset.degree);
+            // Start the timer
+            startTimer(minutes) {
+                try {
+                    this.timerSeconds = minutes * 60;
+                    this.updateTimerDisplay();
 
-            const existingChord = dropZone.querySelector('.chord-text');
-            if (existingChord) {
-                existingChord.remove();
+                    if (this.timerInterval) {
+                        clearInterval(this.timerInterval);
+                    }
+
+                    this.timerInterval = setInterval(() => {
+                        this.timerSeconds--;
+                        this.updateTimerDisplay();
+
+                        if (this.timerSeconds <= 0) {
+                            this.stopTimer();
+                            alert(this.t('timeUp'));
+                        }
+                    }, 1000);
+                } catch (error) {
+                    console.error('Error starting timer:', error);
+                }
             }
 
-            const chordText = document.createElement('span');
-            chordText.className = 'chord-text';
-            chordText.textContent = draggedChord;
-            dropZone.appendChild(chordText);
-
-            dropZone.classList.add('filled');
-            dropZone.classList.remove('correct', 'incorrect');
-
-            const key = scale + '-' + degree;
-            userAnswers[key] = draggedChord;
-
-            if (config.validation === 'instant') {
-                validateCell(dropZone, scale, degree);
+            // Stop the timer
+            stopTimer() {
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                    this.timerInterval = null;
+                }
             }
 
-            updateProgress();
-            updateScaleClearButtons();
-        }
+            // Update the timer display
+            updateTimerDisplay() {
+                const minutes = Math.floor(this.timerSeconds / 60);
+                const seconds = this.timerSeconds % 60;
+                const timeText = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
-        function removeChordFromCell(dropZone) {
-            const chordText = dropZone.querySelector('.chord-text');
-            if (!chordText) return;
+                this.elements.timerText.textContent = timeText;
 
-            const scale = dropZone.dataset.scale;
-            const degree = parseInt(dropZone.dataset.degree);
-            const key = scale + '-' + degree;
+                // Change color based on remaining time
+                this.elements.timerDisplay.classList.remove('warning', 'danger');
+                if (this.timerSeconds <= this.TIMER_DANGER_THRESHOLD) {
+                    this.elements.timerDisplay.classList.add('danger');
+                } else if (this.timerSeconds <= this.TIMER_WARNING_THRESHOLD) {
+                    this.elements.timerDisplay.classList.add('warning');
+                }
+            }
 
-            delete userAnswers[key];
+            // Show the start screen
+            showStartScreen() {
+                this.stopTimer();
+                this.quizMode.active = false;
+                this.quizMode.currentCell = null;
+                this.quizMode.availableCells = [];
+                this.elements.mainScreen.style.display = 'none';
+                this.elements.startScreen.style.display = 'block';
+                this.resetApp();
+            }
 
-            chordText.remove();
-            dropZone.classList.remove('filled', 'correct', 'incorrect');
+            // Group chords by note
+            groupChordsByNote(chords) {
+                const groups = {
+                    'A': [], 'B': [], 'C': [], 'D': [], 'E': [], 'F': [], 'G': []
+                };
 
-            updateProgress();
-            updateScaleClearButtons();
-        }
+                chords.forEach(chord => {
+                    const baseNote = chord.charAt(0);
+                    if (groups[baseNote]) {
+                        groups[baseNote].push(chord);
+                    }
+                });
 
-        function clearScaleRow(row) {
-            const scale = row.dataset.scale;
+                return groups;
+            }
 
-            const dropZones = row.querySelectorAll('.drop-zone');
+            // Create chord element
+            createChordElement(chord) {
+                const chordEl = document.createElement('div');
+                chordEl.className = 'chord';
+                chordEl.textContent = chord;
+                chordEl.draggable = true;
+                chordEl.dataset.chord = chord;
 
-            dropZones.forEach(dropZone => {
-                const chordText = dropZone.querySelector('.chord-text');
-                if (chordText) {
+                chordEl.addEventListener('dragstart', this.handleDragStart.bind(this));
+                chordEl.addEventListener('dragend', this.handleDragEnd.bind(this));
+
+                return chordEl;
+            }
+
+            // Build the chord bank
+            buildChordBank() {
+                try {
+                    this.elements.chordBank.innerHTML = '';
+                    let chords = [];
+
+                    if (this.config.difficulty === 'all') {
+                        Object.values(scalesData).forEach(scale => {
+                            chords = chords.concat(scale.chords);
+                        });
+                        chords = [...new Set(chords)];
+                    } else {
+                        this.config.selectedScales.forEach(scaleName => {
+                            chords = chords.concat(scalesData[scaleName].chords);
+                        });
+                        chords = [...new Set(chords)];
+                    }
+
+                    const chordGroups = this.groupChordsByNote(chords);
+
+                    ['A', 'B', 'C', 'D', 'E', 'F', 'G'].forEach(note => {
+                        if (chordGroups[note].length > 0) {
+                            chordGroups[note].sort();
+
+                            const groupDiv = document.createElement('div');
+                            groupDiv.className = 'chord-group';
+
+                            const label = document.createElement('div');
+                            label.className = 'chord-group-label';
+                            label.textContent = note + ':';
+                            groupDiv.appendChild(label);
+
+                            const rowDiv = document.createElement('div');
+                            rowDiv.className = 'chord-row';
+
+                            chordGroups[note].forEach(chord => {
+                                rowDiv.appendChild(this.createChordElement(chord));
+                            });
+
+                            groupDiv.appendChild(rowDiv);
+                            this.elements.chordBank.appendChild(groupDiv);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error building chord bank:', error);
+                }
+            }
+
+            // Build the scales table
+            buildTable() {
+                try {
+                    this.elements.scalesTable.innerHTML = '';
+
+                    const thead = document.createElement('thead');
+
+                    // Update header rows with translations
+                    const translatedHeaderRows = [
+                        ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', this.t('numAccidentals')],
+                        [
+                            { full: this.t('tonic'), short: this.t('tonicShort') },
+                            { full: this.t('supertonic'), short: this.t('supertonicShort') },
+                            { full: this.t('mediant'), short: this.t('mediantShort') },
+                            { full: this.t('subdominant'), short: this.t('subdominantShort') },
+                            { full: this.t('dominant'), short: this.t('dominantShort') },
+                            { full: this.t('submediant'), short: this.t('submediantShort') },
+                            { full: this.t('leadingTone'), short: this.t('leadingToneShort') },
+                            ''
+                        ],
+                        [
+                            { full: this.t('unison'), short: this.t('unisonShort') },
+                            'T',
+                            'T',
+                            'S',
+                            'T',
+                            'T',
+                            'T',
+                            { full: this.t('octave'), short: this.t('octaveShort') }
+                        ],
+                        [
+                            { full: this.t('major'), short: this.t('majorShort') },
+                            { full: this.t('minor'), short: this.t('minorShort') },
+                            { full: this.t('minor'), short: this.t('minorShort') },
+                            { full: this.t('major'), short: this.t('majorShort') },
+                            { full: this.t('major'), short: this.t('majorShort') },
+                            { full: this.t('minor'), short: this.t('minorShort') },
+                            { full: this.t('diminished'), short: this.t('diminishedShort') },
+                            ''
+                        ]
+                    ];
+
+                    translatedHeaderRows.forEach((row, index) => {
+                        const headerRow = document.createElement('tr');
+                        headerRow.className = 'header-row-' + (index + 1);
+
+                        const scaleHeader = document.createElement('th');
+                        scaleHeader.rowSpan = index === 0 ? 4 : 1;
+                        if (index === 0) {
+                            const fullSpan = document.createElement('span');
+                            fullSpan.className = 'full-text';
+                            fullSpan.textContent = this.t('scale');
+
+                            const shortSpan = document.createElement('span');
+                            shortSpan.className = 'mobile-short';
+                            shortSpan.textContent = this.t('scaleShort');
+                            shortSpan.dataset.fullText = this.t('scale');
+                            shortSpan.addEventListener('click', this.showTooltip.bind(this));
+
+                            scaleHeader.appendChild(fullSpan);
+                            scaleHeader.appendChild(shortSpan);
+                            headerRow.appendChild(scaleHeader);
+                        } else if (index > 0) {
+                            scaleHeader.textContent = '';
+                        }
+
+                        row.forEach((header, i) => {
+                            const th = document.createElement('th');
+
+                            if (typeof header === 'object' && header.full) {
+                                const fullSpan = document.createElement('span');
+                                fullSpan.className = 'full-text';
+                                fullSpan.textContent = header.full;
+
+                                const shortSpan = document.createElement('span');
+                                shortSpan.className = 'mobile-short';
+                                shortSpan.textContent = header.short;
+                                shortSpan.dataset.fullText = header.full;
+                                shortSpan.addEventListener('click', this.showTooltip.bind(this));
+
+                                th.appendChild(fullSpan);
+                                th.appendChild(shortSpan);
+                            } else {
+                                th.textContent = header;
+                            }
+
+                            if (index === 0 && i < 7) {
+                                th.className = 'degree-' + (i + 1);
+
+                                if (i === 0 || i === 3 || i === 4) {
+                                    th.classList.add('col-primary');
+                                } else if (i === 1 || i === 2 || i === 5) {
+                                    th.classList.add('col-secondary');
+                                } else if (i === 6) {
+                                    th.classList.add('col-diminished');
+                                }
+                            }
+
+                            headerRow.appendChild(th);
+                        });
+
+                        thead.appendChild(headerRow);
+                    });
+
+                    this.elements.scalesTable.appendChild(thead);
+
+                    const tbody = document.createElement('tbody');
+
+                    this.config.selectedScales.forEach(scale => {
+                        const row = document.createElement('tr');
+                        row.dataset.scale = scale;
+
+                        const scaleCell = document.createElement('td');
+                        scaleCell.className = 'scale-cell';
+
+                        const scaleName = document.createElement('span');
+                        scaleName.textContent = scale;
+                        scaleCell.appendChild(scaleName);
+
+                        const clearRowBtn = document.createElement('button');
+                        clearRowBtn.className = 'clear-row-btn';
+                        clearRowBtn.textContent = '×';
+                        clearRowBtn.title = this.t('clearRowTitle');
+                        clearRowBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            this.clearScaleRow(row);
+                        };
+                        scaleCell.appendChild(clearRowBtn);
+
+                        row.appendChild(scaleCell);
+
+                        for (let degree = 0; degree < 7; degree++) {
+                            const cell = document.createElement('td');
+
+                            if (degree === 0 || degree === 3 || degree === 4) {
+                                cell.classList.add('cell-primary');
+                            } else if (degree === 1 || degree === 2 || degree === 5) {
+                                cell.classList.add('cell-secondary');
+                            } else if (degree === 6) {
+                                cell.classList.add('cell-diminished');
+                            }
+
+                            const dropZone = document.createElement('div');
+                            dropZone.className = 'drop-zone';
+                            dropZone.dataset.scale = scale;
+                            dropZone.dataset.degree = degree;
+
+                            const removeBtn = document.createElement('button');
+                            removeBtn.className = 'remove-btn';
+                            removeBtn.textContent = '×';
+                            removeBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                this.removeChordFromCell(dropZone);
+                            };
+
+                            dropZone.appendChild(removeBtn);
+
+                            dropZone.addEventListener('dragover', this.handleDragOver.bind(this));
+                            dropZone.addEventListener('dragleave', this.handleDragLeave.bind(this));
+                            dropZone.addEventListener('drop', this.handleDrop.bind(this));
+
+                            dropZone.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                if (!dropZone.classList.contains(CSS_CLASSES.FILLED)) {
+                                    // In quiz mode, only allow clicking the active cell
+                                    if (this.quizMode.active && this.quizMode.currentCell !== dropZone) {
+                                        return;
+                                    }
+                                    this.showChordDropdown(dropZone);
+                                }
+                            });
+
+                            cell.appendChild(dropZone);
+                            row.appendChild(cell);
+                        }
+
+                        const infoCell = document.createElement('td');
+                        infoCell.textContent = scalesData[scale].accidentals;
+                        infoCell.className = 'info-cell';
+                        row.appendChild(infoCell);
+
+                        tbody.appendChild(row);
+                    });
+
+                    this.elements.scalesTable.appendChild(tbody);
+
+                    this.userAnswers = {};
+                } catch (error) {
+                    console.error('Error building table:', error);
+                }
+            }
+
+            // Handle drag start
+            handleDragStart(e) {
+                try {
+                    this.draggedChord = e.target.dataset.chord;
+                    e.target.classList.add(CSS_CLASSES.DRAGGING);
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/html', e.target.innerHTML);
+                } catch (error) {
+                    console.error('Error handling drag start:', error);
+                }
+            }
+
+            // Handle drag end
+            handleDragEnd(e) {
+                try {
+                    e.target.classList.remove(CSS_CLASSES.DRAGGING);
+                } catch (error) {
+                    console.error('Error handling drag end:', error);
+                }
+            }
+
+            // Handle drag over
+            handleDragOver(e) {
+                try {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    e.target.classList.add(CSS_CLASSES.DRAG_OVER);
+                } catch (error) {
+                    console.error('Error handling drag over:', error);
+                }
+            }
+
+            // Handle drag leave
+            handleDragLeave(e) {
+                try {
+                    e.target.classList.remove(CSS_CLASSES.DRAG_OVER);
+                } catch (error) {
+                    console.error('Error handling drag leave:', error);
+                }
+            }
+
+            // Handle drop
+            handleDrop(e) {
+                try {
+                    e.preventDefault();
+                    e.target.classList.remove(CSS_CLASSES.DRAG_OVER);
+
+                    let dropZone = e.target;
+
+                    if (dropZone.classList.contains('remove-btn')) {
+                        dropZone = dropZone.parentElement;
+                    }
+
+                    // In quiz mode, only allow dropping on the active cell
+                    if (this.quizMode.active && this.quizMode.currentCell !== dropZone) {
+                        return;
+                    }
+
+                    const scale = dropZone.dataset.scale;
+                    const degree = parseInt(dropZone.dataset.degree);
+
+                    const existingChord = dropZone.querySelector('.chord-text');
+                    if (existingChord) {
+                        existingChord.remove();
+                    }
+
+                    const chordText = document.createElement('span');
+                    chordText.className = 'chord-text';
+                    chordText.textContent = this.draggedChord;
+                    dropZone.appendChild(chordText);
+
+                    dropZone.classList.add(CSS_CLASSES.FILLED);
+                    dropZone.classList.remove(CSS_CLASSES.CORRECT, CSS_CLASSES.INCORRECT);
+
+                    const key = scale + '-' + degree;
+                    this.userAnswers[key] = this.draggedChord;
+
+                    if (this.config.validation === 'instant') {
+                        this.validateCell(dropZone, scale, degree);
+                    }
+
+                    this.updateProgress();
+                    this.updateScaleClearButtons();
+
+                    // In quiz mode, check if answer is correct and move to next
+                    if (this.quizMode.active) {
+                        this.checkQuizAnswer(dropZone, scale, degree);
+                    }
+                } catch (error) {
+                    console.error('Error handling drop:', error);
+                }
+            }
+
+            // Remove chord from cell
+            removeChordFromCell(dropZone) {
+                try {
+                    const chordText = dropZone.querySelector('.chord-text');
+                    if (!chordText) return;
+
+                    const scale = dropZone.dataset.scale;
                     const degree = parseInt(dropZone.dataset.degree);
                     const key = scale + '-' + degree;
 
-                    delete userAnswers[key];
+                    delete this.userAnswers[key];
 
                     chordText.remove();
-                    dropZone.classList.remove('filled', 'correct', 'incorrect');
+                    dropZone.classList.remove(CSS_CLASSES.FILLED, CSS_CLASSES.CORRECT, CSS_CLASSES.INCORRECT);
+
+                    this.updateProgress();
+                    this.updateScaleClearButtons();
+                } catch (error) {
+                    console.error('Error removing chord from cell:', error);
                 }
-            });
+            }
 
-            updateProgress();
-            updateScaleClearButtons();
-        }
+            // Clear a scale row
+            clearScaleRow(row) {
+                try {
+                    const scale = row.dataset.scale;
+                    const dropZones = row.querySelectorAll('.drop-zone');
 
-        function updateScaleClearButtons() {
-            const rows = document.querySelectorAll('tbody tr');
+                    dropZones.forEach(dropZone => {
+                        const chordText = dropZone.querySelector('.chord-text');
+                        if (chordText) {
+                            const degree = parseInt(dropZone.dataset.degree);
+                            const key = scale + '-' + degree;
 
-            rows.forEach(row => {
-                const scaleCell = row.querySelector('.scale-cell');
-                if (!scaleCell) return;
+                            delete this.userAnswers[key];
 
-                const dropZones = row.querySelectorAll('.drop-zone');
-                const hasAnyChord = Array.from(dropZones).some(zone =>
-                    zone.querySelector('.chord-text')
+                            chordText.remove();
+                            dropZone.classList.remove(CSS_CLASSES.FILLED, CSS_CLASSES.CORRECT, CSS_CLASSES.INCORRECT);
+                        }
+                    });
+
+                    this.updateProgress();
+                    this.updateScaleClearButtons();
+                } catch (error) {
+                    console.error('Error clearing scale row:', error);
+                }
+            }
+
+            // Update scale clear buttons visibility
+            updateScaleClearButtons() {
+                try {
+                    const rows = this.elements.scalesTable.querySelectorAll('tbody tr');
+
+                    rows.forEach(row => {
+                        const scaleCell = row.querySelector('.scale-cell');
+                        if (!scaleCell) return;
+
+                        const dropZones = row.querySelectorAll('.drop-zone');
+                        const hasAnyChord = Array.from(dropZones).some(zone =>
+                            zone.querySelector('.chord-text')
+                        );
+
+                        if (hasAnyChord) {
+                            scaleCell.classList.add(CSS_CLASSES.HAS_CHORDS);
+                        } else {
+                            scaleCell.classList.remove(CSS_CLASSES.HAS_CHORDS);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error updating scale clear buttons:', error);
+                }
+            }
+
+            // Calculate modal position
+            calculateModalPosition(cellRect, modalRect) {
+                const modalHeight = this.MODAL_HEIGHT;
+
+                const spaceBelow = window.innerHeight - cellRect.bottom;
+                const spaceAbove = cellRect.top;
+
+                let top, left;
+
+                // Vertical positioning
+                if (spaceBelow >= modalHeight + this.MARGIN) {
+                    top = cellRect.bottom + 5;
+                } else if (spaceAbove >= modalHeight + this.MARGIN) {
+                    top = cellRect.top - modalHeight - 5;
+                } else {
+                    top = spaceAbove > spaceBelow
+                        ? Math.max(this.MARGIN, cellRect.top - modalHeight - 5)
+                        : Math.min(window.innerHeight - modalHeight - this.MARGIN, cellRect.bottom + 5);
+                }
+
+                // Horizontal positioning
+                left = Math.max(this.MARGIN,
+                    Math.min(cellRect.left, window.innerWidth - modalRect.width - this.MARGIN)
                 );
 
-                if (hasAnyChord) {
-                    scaleCell.classList.add('has-chords');
-                } else {
-                    scaleCell.classList.remove('has-chords');
-                }
-            });
-        }
-
-        function showChordDropdown(dropZone) {
-            let availableChords = [];
-            const chordElements = document.querySelectorAll('#chordBank .chord:not(.used)');
-            chordElements.forEach(el => {
-                availableChords.push(el.dataset.chord);
-            });
-
-            if (availableChords.length === 0) {
-                return;
+                return { top, left };
             }
 
-            availableChords.sort();
+            // Show chord dropdown
+            showChordDropdown(dropZone) {
+                try {
+                    // Close any existing modal first
+                    this.closeChordModal();
 
-            currentDropZone = dropZone;
+                    let availableChords = [];
+                    const chordElements = document.querySelectorAll('#chordBank .chord:not(.used)');
+                    chordElements.forEach(el => {
+                        availableChords.push(el.dataset.chord);
+                    });
 
-            const rect = dropZone.getBoundingClientRect();
+                    if (availableChords.length === 0) {
+                        return;
+                    }
 
-            const modal = document.getElementById('chordModal');
+                    availableChords.sort();
 
-            modal.innerHTML = '';
+                    this.currentDropZone = dropZone;
 
-            const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#5c6bc0';
-            const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-primary').trim() || '#ffffff';
-            const bgTertiary = getComputedStyle(document.documentElement).getPropertyValue('--bg-tertiary').trim();
-            const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim();
+                    const rect = dropZone.getBoundingClientRect();
+                    const modal = this.elements.chordModal;
 
-            const closeBtn = document.createElement('button');
-            closeBtn.className = 'close-modal-btn';
-            closeBtn.textContent = '×';
-            closeBtn.style.position = 'sticky';
-            closeBtn.style.top = '0';
-            closeBtn.style.right = '8px';
-            closeBtn.style.float = 'right';
-            closeBtn.style.width = '28px';
-            closeBtn.style.height = '28px';
-            closeBtn.style.border = '1px solid var(--border-color)';
-            closeBtn.style.borderRadius = '6px';
-            closeBtn.style.cursor = 'pointer';
-            closeBtn.style.fontSize = '20px';
-            closeBtn.style.fontWeight = '300';
-            closeBtn.style.padding = '0';
-            closeBtn.style.display = 'flex';
-            closeBtn.style.alignItems = 'center';
-            closeBtn.style.justifyContent = 'center';
-            closeBtn.style.zIndex = '10001';
-            closeBtn.style.marginBottom = '8px';
-            closeBtn.style.marginLeft = 'auto';
-            closeBtn.style.backgroundColor = bgTertiary;
-            closeBtn.style.color = textColor;
+                    modal.innerHTML = '';
 
-            closeBtn.onmouseenter = function() {
-                this.style.backgroundColor = '#f44336';
-                this.style.color = 'white';
-                this.style.borderColor = '#f44336';
-            };
+                    const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#5c6bc0';
+                    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-primary').trim() || '#ffffff';
+                    const bgTertiary = getComputedStyle(document.documentElement).getPropertyValue('--bg-tertiary').trim();
+                    const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim();
 
-            closeBtn.onmouseleave = function() {
-                this.style.backgroundColor = bgTertiary;
-                this.style.color = textColor;
-                this.style.borderColor = '';
-            };
+                    const closeBtn = document.createElement('button');
+                    closeBtn.className = 'close-modal-btn';
+                    closeBtn.textContent = '×';
+                    closeBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        this.closeChordModal();
+                    };
+                    modal.appendChild(closeBtn);
 
-            closeBtn.onclick = function(e) {
-                e.stopPropagation();
-                closeChordModal();
-            };
-            modal.appendChild(closeBtn);
+                    availableChords.forEach(chord => {
+                        const option = document.createElement('div');
+                        option.className = 'modal-option';
+                        option.textContent = chord;
+                        option.dataset.chord = chord;
 
-            availableChords.forEach(chord => {
-                const option = document.createElement('div');
-                option.className = 'modal-option';
-                option.textContent = chord;
-                option.dataset.chord = chord;
-                option.style.cursor = 'pointer';
-                option.style.padding = '8px 12px';
-                option.style.borderRadius = '4px';
-                option.style.marginBottom = '2px';
-                option.style.border = '1px solid transparent';
+                        option.addEventListener('mouseenter', function() {
+                            const allOptions = modal.querySelectorAll('.modal-option');
+                            allOptions.forEach(opt => opt.classList.remove(CSS_CLASSES.KEYBOARD_FOCUSED));
 
-                option.addEventListener('mouseenter', function() {
-                    // Remove keyboard focus from all options when hovering
-                    const allOptions = modal.querySelectorAll('.modal-option');
-                    allOptions.forEach(opt => opt.classList.remove('keyboard-focused'));
+                            this.style.backgroundColor = accentColor;
+                            this.style.color = 'white';
+                        });
 
-                    this.style.backgroundColor = accentColor;
-                    this.style.color = 'white';
-                });
+                        option.addEventListener('mouseleave', function() {
+                            this.style.backgroundColor = 'transparent';
+                            this.style.color = '';
+                        });
 
-                option.addEventListener('mouseleave', function() {
-                    this.style.backgroundColor = 'transparent';
-                    this.style.color = '';
-                });
+                        option.onclick = (e) => {
+                            e.stopPropagation();
+                            const chordToAdd = option.dataset.chord;
+                            const zone = this.currentDropZone;
+                            this.closeChordModal();
+                            if (zone) {
+                                this.addChordToCell(zone, chordToAdd);
+                            }
+                        };
+                        modal.appendChild(option);
+                    });
 
-                option.onclick = function(e) {
+                    // Position modal
+                    modal.style.position = 'fixed';
+                    modal.style.zIndex = '10000';
+                    modal.style.height = this.MODAL_HEIGHT + 'px';
+                    modal.style.maxHeight = this.MODAL_HEIGHT + 'px';
+                    modal.style.overflowY = 'scroll';
+                    modal.style.display = 'block';
+                    modal.style.visibility = 'hidden';
+                    modal.style.left = '0px';
+                    modal.style.top = '0px';
+
+                    const modalRect = modal.getBoundingClientRect();
+                    const position = this.calculateModalPosition(rect, modalRect);
+
+                    modal.style.left = position.left + 'px';
+                    modal.style.top = position.top + 'px';
+                    modal.style.visibility = 'visible';
+                    modal.style.backgroundColor = bgColor;
+                    modal.style.border = '2px solid #000000';
+                    modal.style.padding = '6px';
+                    modal.style.borderRadius = '8px';
+                    modal.style.width = '200px';
+
+                    modal.classList.add(CSS_CLASSES.ACTIVE);
+
+                    modal.onclick = (e) => {
+                        e.stopPropagation();
+                    };
+
+                    // Setup modal event listeners
+                    this.setupModalEventListeners();
+                } catch (error) {
+                    console.error('Error showing chord dropdown:', error);
+                }
+            }
+
+            // Setup modal event listeners
+            setupModalEventListeners() {
+                this.boundModalClickHandler = this.handleClickOutsideModal.bind(this);
+                this.boundModalKeyHandler = this.handleModalKeyPress.bind(this);
+
+                document.addEventListener('click', this.boundModalClickHandler, true);
+                document.addEventListener('keydown', this.boundModalKeyHandler, true);
+            }
+
+            // Handle modal key press - FIXED VERSION
+            handleModalKeyPress(e) {
+                try {
+                    const modal = this.elements.chordModal;
+                    if (!modal.classList.contains(CSS_CLASSES.ACTIVE)) return;
+
+                    const key = e.key.toUpperCase();
+
+                    if (key >= 'A' && key <= 'G') {
+                        e.preventDefault();
+
+                        const options = Array.from(modal.querySelectorAll('.modal-option'));
+                        const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#5c6bc0';
+                        const closeBtn = modal.querySelector('.close-modal-btn');
+
+                        // Reset all options
+                        options.forEach(opt => {
+                            opt.classList.remove(CSS_CLASSES.KEYBOARD_FOCUSED);
+                            opt.style.backgroundColor = 'transparent';
+                            opt.style.color = '';
+                        });
+
+                        // Find all options that start with the pressed key
+                        const matchingOptions = options.filter(option => {
+                            const chordName = option.dataset.chord;
+                            return chordName && chordName.charAt(0).toUpperCase() === key;
+                        });
+
+                        // Find all options that don't start with the pressed key
+                        const nonMatchingOptions = options.filter(option => {
+                            const chordName = option.dataset.chord;
+                            return chordName && chordName.charAt(0).toUpperCase() !== key;
+                        });
+
+                        if (matchingOptions.length > 0) {
+                            // Reorder: matching options first, then non-matching
+                            const reorderedOptions = [...matchingOptions, ...nonMatchingOptions];
+
+                            // Clear modal content except close button
+                            options.forEach(opt => opt.remove());
+
+                            // Re-append in new order
+                            reorderedOptions.forEach(opt => modal.appendChild(opt));
+
+                            // Apply focus styling to the first match
+                            const firstMatch = matchingOptions[0];
+                            firstMatch.classList.add(CSS_CLASSES.KEYBOARD_FOCUSED);
+                            firstMatch.style.backgroundColor = accentColor;
+                            firstMatch.style.color = 'white';
+
+                            // Scroll to top to show the first matching option
+                            modal.scrollTo({
+                                top: 0,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error handling modal key press:', error);
+                }
+            }
+
+            // Handle click outside modal
+            handleClickOutsideModal(e) {
+                try {
+                    const modal = this.elements.chordModal;
+
+                    if (!modal.contains(e.target) && modal.classList.contains(CSS_CLASSES.ACTIVE)) {
+                        this.closeChordModal();
+                    }
+                } catch (error) {
+                    console.error('Error handling click outside modal:', error);
+                }
+            }
+
+            // Close chord modal
+            closeChordModal() {
+                try {
+                    const modal = this.elements.chordModal;
+                    modal.classList.remove(CSS_CLASSES.ACTIVE);
+                    modal.style.display = 'none';
+
+                    // Remove event listeners if they exist
+                    if (this.boundModalClickHandler) {
+                        document.removeEventListener('click', this.boundModalClickHandler, true);
+                        this.boundModalClickHandler = null;
+                    }
+                    if (this.boundModalKeyHandler) {
+                        document.removeEventListener('keydown', this.boundModalKeyHandler, true);
+                        this.boundModalKeyHandler = null;
+                    }
+                } catch (error) {
+                    console.error('Error closing chord modal:', error);
+                }
+            }
+
+            // Show tooltip
+            showTooltip(e) {
+                try {
                     e.stopPropagation();
-                    const chordToAdd = this.dataset.chord;
-                    const zone = currentDropZone;
-                    closeChordModal();
-                    if (zone) {
-                        addChordToCell(zone, chordToAdd);
+
+                    const fullText = e.target.dataset.fullText;
+                    if (!fullText) return;
+
+                    const existingTooltip = document.querySelector('.tooltip');
+                    if (existingTooltip) {
+                        existingTooltip.remove();
                     }
-                };
-                modal.appendChild(option);
-            });
 
-            let modalTop = rect.bottom + window.scrollY + 5;
-            let modalLeft = rect.left + window.scrollX;
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'tooltip active';
+                    tooltip.textContent = fullText;
+                    document.body.appendChild(tooltip);
 
-            modal.style.position = 'fixed';
-            modal.style.zIndex = '10000';
-            modal.style.height = '350px';
-            modal.style.maxHeight = '350px';
-            modal.style.overflowY = 'scroll';
+                    const rect = e.target.getBoundingClientRect();
+                    const tooltipRect = tooltip.getBoundingClientRect();
 
-            modal.style.display = 'block';
-            modal.style.visibility = 'hidden';
-            modal.style.left = '0px';
-            modal.style.top = '0px';
+                    let top = rect.bottom + 5;
+                    let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
 
-            const modalRect = modal.getBoundingClientRect();
-            const modalHeight = 350;
-
-            // Calculate available space below and above the cell
-            const spaceBelow = window.innerHeight - rect.bottom;
-            const spaceAbove = rect.top;
-
-            // Decide position based on available space
-            if (spaceBelow >= modalHeight + 10) {
-                // Enough space below - position below the cell
-                modalTop = rect.bottom + 5;
-            } else if (spaceAbove >= modalHeight + 10) {
-                // Not enough space below but enough above - position above the cell
-                modalTop = rect.top - modalHeight - 5;
-            } else {
-                // Not enough space either way - position where there's more space
-                if (spaceAbove > spaceBelow) {
-                    modalTop = rect.top - modalHeight - 5;
-                    // Make sure it doesn't go above viewport
-                    if (modalTop < 10) {
-                        modalTop = 10;
+                    if (left < 10) left = 10;
+                    if (left + tooltipRect.width > window.innerWidth - 10) {
+                        left = window.innerWidth - tooltipRect.width - 10;
                     }
-                } else {
-                    modalTop = rect.bottom + 5;
-                    // Make sure it doesn't go below viewport
-                    if (modalTop + modalHeight > window.innerHeight - 10) {
-                        modalTop = window.innerHeight - modalHeight - 10;
+
+                    if (top + tooltipRect.height > window.innerHeight - 10) {
+                        top = rect.top - tooltipRect.height - 5;
                     }
+
+                    tooltip.style.top = top + 'px';
+                    tooltip.style.left = left + 'px';
+
+                    setTimeout(() => {
+                        if (tooltip && tooltip.parentNode) {
+                            tooltip.remove();
+                        }
+                    }, 2000);
+
+                    const removeTooltip = () => {
+                        if (tooltip && tooltip.parentNode) {
+                            tooltip.remove();
+                        }
+                        document.removeEventListener('click', removeTooltip);
+                    };
+
+                    setTimeout(() => {
+                        document.addEventListener('click', removeTooltip);
+                    }, 100);
+                } catch (error) {
+                    console.error('Error showing tooltip:', error);
                 }
             }
 
-            // Handle horizontal positioning
-            modalLeft = rect.left;
+            // Add chord to cell
+            addChordToCell(dropZone, chord) {
+                try {
+                    const scale = dropZone.dataset.scale;
+                    const degree = parseInt(dropZone.dataset.degree);
 
-            // Check if modal goes beyond right edge
-            if (modalLeft + modalRect.width > window.innerWidth) {
-                modalLeft = window.innerWidth - modalRect.width - 10;
-            }
-
-            // Check if modal goes beyond left edge
-            if (modalLeft < 10) {
-                modalLeft = 10;
-            }
-
-            modal.style.left = modalLeft + 'px';
-            modal.style.top = modalTop + 'px';
-            modal.style.visibility = 'visible';
-            modal.style.display = 'block';
-            modal.style.backgroundColor = bgColor;
-            modal.style.border = '2px solid #000000';
-            modal.style.padding = '6px';
-            modal.style.borderRadius = '8px';
-            modal.style.width = '200px';
-
-            modal.classList.add('active');
-
-            modal.onclick = function(e) {
-                e.stopPropagation();
-            };
-
-            setTimeout(() => {
-                document.addEventListener('click', handleClickOutsideModal, true);
-                document.addEventListener('keydown', handleModalKeyPress, true);
-            }, 100);
-        }
-
-        function handleModalKeyPress(e) {
-            const modal = document.getElementById('chordModal');
-            if (!modal.classList.contains('active')) return;
-
-            const key = e.key.toUpperCase();
-
-            if (key >= 'A' && key <= 'G') {
-                e.preventDefault();
-
-                const options = modal.querySelectorAll('.modal-option');
-                const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#5c6bc0';
-
-                // Reset all options
-                options.forEach(opt => {
-                    opt.classList.remove('keyboard-focused');
-                    opt.style.backgroundColor = 'transparent';
-                    opt.style.color = '';
-                });
-
-                let foundOption = null;
-                for (let option of options) {
-                    const chordName = option.dataset.chord;
-                    if (chordName.charAt(0).toUpperCase() === key) {
-                        foundOption = option;
-                        break;
+                    const existingText = dropZone.querySelector('.chord-text');
+                    if (existingText) {
+                        existingText.remove();
                     }
-                }
 
-                if (foundOption) {
-                    foundOption.classList.add('keyboard-focused');
-                    foundOption.style.backgroundColor = accentColor;
-                    foundOption.style.color = 'white';
-                    foundOption.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }
-        }
+                    const chordText = document.createElement('span');
+                    chordText.className = 'chord-text';
+                    chordText.textContent = chord;
+                    dropZone.appendChild(chordText);
 
-        function handleClickOutsideModal(e) {
-            const modal = document.getElementById('chordModal');
+                    dropZone.classList.add(CSS_CLASSES.FILLED);
+                    dropZone.classList.remove(CSS_CLASSES.CORRECT, CSS_CLASSES.INCORRECT);
 
-            if (!modal.contains(e.target) && modal.classList.contains('active')) {
-                closeChordModal();
-                document.removeEventListener('click', handleClickOutsideModal, true);
-            }
-        }
+                    const key = scale + '-' + degree;
+                    this.userAnswers[key] = chord;
 
-        function closeChordModal() {
-            const modal = document.getElementById('chordModal');
-            modal.classList.remove('active');
-            modal.style.display = 'none';
-
-            document.removeEventListener('click', handleClickOutsideModal, true);
-            document.removeEventListener('keydown', handleModalKeyPress, true);
-        }
-
-        function showTooltip(e) {
-            e.stopPropagation();
-
-            const fullText = e.target.dataset.fullText;
-            if (!fullText) return;
-
-            // Remove any existing tooltips
-            const existingTooltip = document.querySelector('.tooltip');
-            if (existingTooltip) {
-                existingTooltip.remove();
-            }
-
-            // Create tooltip
-            const tooltip = document.createElement('div');
-            tooltip.className = 'tooltip active';
-            tooltip.textContent = fullText;
-            document.body.appendChild(tooltip);
-
-            // Position tooltip
-            const rect = e.target.getBoundingClientRect();
-            const tooltipRect = tooltip.getBoundingClientRect();
-
-            let top = rect.bottom + 5;
-            let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
-
-            // Adjust if tooltip goes off screen
-            if (left < 10) left = 10;
-            if (left + tooltipRect.width > window.innerWidth - 10) {
-                left = window.innerWidth - tooltipRect.width - 10;
-            }
-
-            if (top + tooltipRect.height > window.innerHeight - 10) {
-                top = rect.top - tooltipRect.height - 5;
-            }
-
-            tooltip.style.top = top + 'px';
-            tooltip.style.left = left + 'px';
-
-            // Remove tooltip after 2 seconds or on next click
-            setTimeout(() => {
-                if (tooltip && tooltip.parentNode) {
-                    tooltip.remove();
-                }
-            }, 2000);
-
-            const removeTooltip = () => {
-                if (tooltip && tooltip.parentNode) {
-                    tooltip.remove();
-                }
-                document.removeEventListener('click', removeTooltip);
-            };
-
-            setTimeout(() => {
-                document.addEventListener('click', removeTooltip);
-            }, 100);
-        }
-
-        function addChordToCell(dropZone, chord) {
-            const scale = dropZone.dataset.scale;
-            const degree = parseInt(dropZone.dataset.degree);
-
-            const existingText = dropZone.querySelector('.chord-text');
-            if (existingText) {
-                existingText.remove();
-            }
-
-            const chordText = document.createElement('span');
-            chordText.className = 'chord-text';
-            chordText.textContent = chord;
-            dropZone.appendChild(chordText);
-
-            dropZone.classList.add('filled');
-            dropZone.classList.remove('correct', 'incorrect');
-
-            const key = scale + '-' + degree;
-            userAnswers[key] = chord;
-
-            if (config.validation === 'instant') {
-                validateCell(dropZone, scale, degree);
-            }
-
-            updateProgress();
-
-            currentDropZone = null;
-
-            updateScaleClearButtons();
-        }
-
-        function validateCell(dropZone, scale, degree) {
-            const chordText = dropZone.querySelector('.chord-text');
-            if (!chordText) return;
-
-            const userChord = chordText.textContent.replace(' ✓', '').replace(' ✗', '');
-            const correctChord = scales[scale].chords[degree];
-
-            if (userChord === correctChord) {
-                dropZone.classList.add('correct');
-                dropZone.classList.remove('incorrect');
-            } else {
-                dropZone.classList.add('incorrect');
-                dropZone.classList.remove('correct');
-            }
-        }
-
-        function checkAllAnswers() {
-            const dropZones = document.querySelectorAll('.drop-zone');
-            dropZones.forEach(zone => {
-                const chordText = zone.querySelector('.chord-text');
-                if (chordText) {
-                    const scale = zone.dataset.scale;
-                    const degree = parseInt(zone.dataset.degree);
-                    validateCell(zone, scale, degree);
-                }
-            });
-            updateProgress();
-        }
-
-        function resetApp() {
-            if (config.timer > 0) {
-                if (confirm('Reset will restart the timer. Continue?')) {
-                    if (timerInterval) {
-                        clearInterval(timerInterval);
+                    if (this.config.validation === 'instant') {
+                        this.validateCell(dropZone, scale, degree);
                     }
-                    startTimer(config.timer);
-                } else {
-                    return;
+
+                    this.updateProgress();
+
+                    this.currentDropZone = null;
+                    this.updateScaleClearButtons();
+
+                    // In quiz mode, check if answer is correct and move to next
+                    if (this.quizMode.active) {
+                        this.checkQuizAnswer(dropZone, scale, degree);
+                    }
+                } catch (error) {
+                    console.error('Error adding chord to cell:', error);
                 }
             }
-            buildChordBank();
-            buildTable();
-            updateProgress();
+
+            // Validate a cell
+            validateCell(dropZone, scale, degree) {
+                try {
+                    const chordText = dropZone.querySelector('.chord-text');
+                    if (!chordText) return;
+
+                    const userChord = chordText.textContent.replace(' ✓', '').replace(' ✗', '');
+                    const correctChord = scalesData[scale].chords[degree];
+
+                    if (userChord === correctChord) {
+                        dropZone.classList.add(CSS_CLASSES.CORRECT);
+                        dropZone.classList.remove(CSS_CLASSES.INCORRECT);
+                    } else {
+                        dropZone.classList.add(CSS_CLASSES.INCORRECT);
+                        dropZone.classList.remove(CSS_CLASSES.CORRECT);
+                    }
+                } catch (error) {
+                    console.error('Error validating cell:', error);
+                }
+            }
+
+            // Check all answers
+            checkAllAnswers() {
+                try {
+                    const dropZones = this.elements.scalesTable.querySelectorAll('.drop-zone');
+                    dropZones.forEach(zone => {
+                        const chordText = zone.querySelector('.chord-text');
+                        if (chordText) {
+                            const scale = zone.dataset.scale;
+                            const degree = parseInt(zone.dataset.degree);
+                            this.validateCell(zone, scale, degree);
+                        }
+                    });
+                    this.updateProgress();
+                } catch (error) {
+                    console.error('Error checking all answers:', error);
+                }
+            }
+
+            // Reset the application
+            resetApp() {
+                try {
+                    if (this.config.timer > 0) {
+                        if (confirm(this.t('resetConfirm'))) {
+                            this.stopTimer();
+                            this.startTimer(this.config.timer);
+                        } else {
+                            return;
+                        }
+                    }
+                    this.buildChordBank();
+                    this.buildTable();
+                    this.updateProgress();
+
+                    // Reinitialize quiz mode if active
+                    if (this.config.practiceMode === 'quiz') {
+                        this.initQuizMode();
+                    }
+                } catch (error) {
+                    console.error('Error resetting app:', error);
+                }
+            }
+
+            // Initialize quiz mode
+            initQuizMode() {
+                try {
+                    this.quizMode.active = true;
+                    this.quizMode.availableCells = [];
+
+                    // Collect all empty cells from selected scales
+                    this.config.selectedScales.forEach(scale => {
+                        for (let degree = 0; degree < 7; degree++) {
+                            this.quizMode.availableCells.push({ scale, degree });
+                        }
+                    });
+
+                    // Pick first random cell
+                    this.pickNextQuizCell();
+                } catch (error) {
+                    console.error('Error initializing quiz mode:', error);
+                }
+            }
+
+            // Pick next random cell for quiz mode
+            pickNextQuizCell() {
+                try {
+                    if (this.quizMode.availableCells.length === 0) {
+                        // Quiz completed!
+                        this.quizMode.active = false;
+                        this.updateProgress();
+                        return;
+                    }
+
+                    // Remove previous cell highlighting
+                    const allDropZones = this.elements.scalesTable.querySelectorAll('.drop-zone');
+                    allDropZones.forEach(zone => {
+                        zone.classList.remove('quiz-active', 'quiz-disabled');
+                    });
+
+                    // Pick random cell
+                    const randomIndex = Math.floor(Math.random() * this.quizMode.availableCells.length);
+                    const { scale, degree } = this.quizMode.availableCells[randomIndex];
+
+                    // Find the corresponding drop zone
+                    const targetRow = this.elements.scalesTable.querySelector(`tr[data-scale="${scale}"]`);
+                    if (!targetRow) return;
+
+                    const dropZones = targetRow.querySelectorAll('.drop-zone');
+                    const targetDropZone = dropZones[degree];
+
+                    if (targetDropZone) {
+                        this.quizMode.currentCell = targetDropZone;
+                        targetDropZone.classList.add('quiz-active');
+
+                        // Disable all other cells
+                        allDropZones.forEach(zone => {
+                            if (zone !== targetDropZone && !zone.classList.contains(CSS_CLASSES.FILLED)) {
+                                zone.classList.add('quiz-disabled');
+                            }
+                        });
+
+                        // Scroll to the active cell
+                        targetDropZone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                } catch (error) {
+                    console.error('Error picking next quiz cell:', error);
+                }
+            }
+
+            // Check quiz answer
+            checkQuizAnswer(dropZone, scale, degree) {
+                try {
+                    // Always validate in quiz mode
+                    this.validateCell(dropZone, scale, degree);
+
+                    const chordText = dropZone.querySelector('.chord-text');
+                    if (!chordText) return;
+
+                    const userChord = chordText.textContent;
+                    const correctChord = scalesData[scale].chords[degree];
+
+                    if (userChord === correctChord) {
+                        // Correct! Remove quiz-active class
+                        dropZone.classList.remove('quiz-active');
+
+                        // Remove from available cells and pick next
+                        this.quizMode.availableCells = this.quizMode.availableCells.filter(
+                            cell => !(cell.scale === scale && cell.degree === degree)
+                        );
+
+                        // Small delay before moving to next cell
+                        setTimeout(() => {
+                            this.pickNextQuizCell();
+                        }, 500);
+                    } else {
+                        // Incorrect - keep quiz-active class so cell remains highlighted
+                        // The red background from 'incorrect' class will show, but quiz-active border remains
+                        // User can try again on the same cell
+                    }
+                } catch (error) {
+                    console.error('Error checking quiz answer:', error);
+                }
+            }
+
+            // Update progress display
+            updateProgress() {
+                try {
+                    const totalCells = this.config.selectedScales.length * 7;
+                    const filled = Object.keys(this.userAnswers).length;
+
+                    let correct = 0;
+                    if (this.config.validation === 'instant' || this.elements.scalesTable.querySelectorAll('.correct').length > 0) {
+                        correct = this.elements.scalesTable.querySelectorAll('.correct').length;
+                    }
+
+                    this.elements.progress.innerHTML = `${this.t('filled')}: ${filled}/${totalCells}`;
+
+                    if (correct > 0) {
+                        this.elements.progress.innerHTML += ` | ${this.t('correct')}: ${correct}/${filled}`;
+                    }
+
+                    if (filled === totalCells && correct === totalCells) {
+                        this.elements.progress.innerHTML += ` | ${this.t('congratulations')}`;
+                        this.stopTimer();
+                    } else if (filled === totalCells) {
+                        this.stopTimer();
+                    }
+                } catch (error) {
+                    console.error('Error updating progress:', error);
+                }
+            }
         }
 
-        function updateProgress() {
-            const totalCells = config.selectedScales.length * 7;
-            const filled = Object.keys(userAnswers).length;
-
-            let correct = 0;
-            if (config.validation === 'instant' || document.querySelectorAll('.correct').length > 0) {
-                correct = document.querySelectorAll('.correct').length;
-            }
-
-            const progressEl = document.getElementById('progress');
-            progressEl.innerHTML = `Filled: ${filled}/${totalCells}`;
-
-            if (correct > 0) {
-                progressEl.innerHTML += ` | Correct: ${correct}/${filled}`;
-            }
-
-            if (filled === totalCells && correct === totalCells) {
-                progressEl.innerHTML += ` | 🎉 Congratulations! All answers are correct!`;
-
-                // Stop timer if running
-                if (timerInterval) {
-                    clearInterval(timerInterval);
-                    timerInterval = null;
-                }
-            } else if (filled === totalCells) {
-                // All cells filled but not all correct - stop timer anyway
-                if (timerInterval) {
-                    clearInterval(timerInterval);
-                    timerInterval = null;
-                }
-            }
-        }
+        // Initialize the application
+        const App = new MusicTheoryApp();
     </script>
 </body>
 </html>
