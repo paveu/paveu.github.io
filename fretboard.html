@@ -334,6 +334,7 @@
             margin: 0 auto;
             overflow-x: auto;
             padding: 20px;
+            scroll-behavior: smooth;
         }
 
         #fretboard {
@@ -509,143 +510,139 @@
 <body>
     <div class="container">
         <div class="language-switcher">
-            <button id="langPL" class="active" onclick="App.setLanguage('pl')">PL</button>
+            <button id="langPL" onclick="App.setLanguage('pl')">PL</button>
             <button id="langEN" onclick="App.setLanguage('en')">EN</button>
         </div>
 
         <div id="startScreen">
-            <a href="https://paveu.pl" class="back-to-home">← Back to paveu.pl</a>
+            <a href="https://paveu.pl" class="back-to-home" data-i18n="backToHome"></a>
 
-            <h1>🎸 Fretboard Notes Trainer</h1>
+            <h1 data-i18n="title"></h1>
 
             <div class="config-section">
-                <h3>Number of Frets</h3>
+                <h3 data-i18n="numberOfFrets"></h3>
                 <div class="radio-group">
                     <label class="radio-option">
                         <input type="radio" name="frets" value="12" checked>
-                        <span>12 frets</span>
+                        <span data-i18n="frets12"></span>
                     </label>
                     <label class="radio-option">
                         <input type="radio" name="frets" value="15">
-                        <span>15 frets</span>
+                        <span data-i18n="frets15"></span>
                     </label>
                     <label class="radio-option">
                         <input type="radio" name="frets" value="22">
-                        <span>22 frets</span>
+                        <span data-i18n="frets22"></span>
                     </label>
                     <label class="radio-option">
                         <input type="radio" name="frets" value="24">
-                        <span>24 frets</span>
+                        <span data-i18n="frets24"></span>
                     </label>
                 </div>
             </div>
 
             <div class="config-section">
-                <h3>Note Notation</h3>
+                <h3 data-i18n="noteNotation"></h3>
                 <div class="radio-group">
                     <label class="radio-option">
                         <input type="radio" name="notation" value="sharps" checked>
-                        <span>Sharps (#)</span>
+                        <span data-i18n="sharps"></span>
                     </label>
                     <label class="radio-option">
                         <input type="radio" name="notation" value="flats">
-                        <span>Flats (♭)</span>
+                        <span data-i18n="flats"></span>
                     </label>
                     <label class="radio-option">
                         <input type="radio" name="notation" value="both">
-                        <span>Both (# and ♭)</span>
+                        <span data-i18n="both"></span>
                     </label>
                 </div>
             </div>
 
             <div class="config-section">
-                <h3>Strings to Practice</h3>
+                <h3 data-i18n="stringsToPractice"></h3>
                 <div class="string-checkboxes">
                     <div class="checkbox-option">
-                        <input type="checkbox" id="string6" value="6" checked>
-                        <label for="string6">6th (E)</label>
-                    </div>
-                    <div class="checkbox-option">
-                        <input type="checkbox" id="string5" value="5" checked>
-                        <label for="string5">5th (A)</label>
-                    </div>
-                    <div class="checkbox-option">
-                        <input type="checkbox" id="string4" value="4" checked>
-                        <label for="string4">4th (D)</label>
-                    </div>
-                    <div class="checkbox-option">
-                        <input type="checkbox" id="string3" value="3" checked>
-                        <label for="string3">3rd (G)</label>
+                        <input type="checkbox" id="string1" value="1" checked>
+                        <label for="string1" data-i18n="string1"></label>
                     </div>
                     <div class="checkbox-option">
                         <input type="checkbox" id="string2" value="2" checked>
-                        <label for="string2">2nd (B)</label>
+                        <label for="string2" data-i18n="string2"></label>
                     </div>
                     <div class="checkbox-option">
-                        <input type="checkbox" id="string1" value="1" checked>
-                        <label for="string1">1st (E)</label>
+                        <input type="checkbox" id="string3" value="3" checked>
+                        <label for="string3" data-i18n="string3"></label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="string4" value="4" checked>
+                        <label for="string4" data-i18n="string4"></label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="string5" value="5" checked>
+                        <label for="string5" data-i18n="string5"></label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="string6" value="6" checked>
+                        <label for="string6" data-i18n="string6"></label>
                     </div>
                 </div>
             </div>
 
             <div class="config-section">
-                <h3>Practice Timer & Mistake Review</h3>
+                <h3 data-i18n="practiceTimerTitle"></h3>
                 <div class="radio-group">
                     <label class="radio-option">
                         <input type="radio" name="timer-mode" value="no-timer" checked>
-                        <span>No timer</span>
+                        <span data-i18n="noTimer"></span>
                     </label>
                     <label class="radio-option">
                         <input type="radio" name="timer-mode" value="custom">
-                        <span>Practice time (minutes): <input type="number" id="timerMinutes" min="1" max="120" value="10" style="margin-left: 10px; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); width: 80px;"></span>
+                        <span><span data-i18n="practiceTime"></span> <input type="number" id="timerMinutes" min="1" max="120" value="10" style="margin-left: 10px; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); width: 80px;"></span>
                     </label>
                 </div>
-                <div class="info-box">
-                    ℹ️ After timer ends, you'll practice only the mistakes you made
-                </div>
+                <div class="info-box" data-i18n="timerInfo"></div>
             </div>
 
             <div class="config-section">
-                <h3>Theme</h3>
+                <h3 data-i18n="theme"></h3>
                 <div class="radio-group">
                     <label class="radio-option">
                         <input type="radio" name="theme" value="light-minimal">
-                        <span>Light Minimal</span>
+                        <span data-i18n="lightMinimal"></span>
                     </label>
                     <label class="radio-option">
                         <input type="radio" name="theme" value="dark-minimal" checked>
-                        <span>Dark Minimal</span>
+                        <span data-i18n="darkMinimal"></span>
                     </label>
                 </div>
             </div>
 
-            <button class="start-button" onclick="App.startApp()">START PRACTICE</button>
+            <button class="start-button" onclick="App.startApp()" data-i18n="startPractice"></button>
         </div>
 
         <div id="mainScreen">
-            <a href="https://paveu.pl" class="back-to-home">← Back to paveu.pl</a>
+            <a href="https://paveu.pl" class="back-to-home" data-i18n="backToHome"></a>
 
-            <h1>🎸 Fretboard Notes Trainer</h1>
+            <h1 data-i18n="title"></h1>
 
             <div class="controls">
-                <button class="btn" onclick="App.showStartScreen()">← Menu</button>
-                <button class="btn" onclick="App.nextQuestion()">⏭️ Skip</button>
+                <button class="btn" onclick="App.showStartScreen()" data-i18n="menu"></button>
+                <button class="btn" onclick="App.nextQuestion()" data-i18n="skip"></button>
                 <div id="timerDisplay" class="timer-display" style="display: none;">
                     ⏱️ <span id="timerText">00:00</span>
                 </div>
                 <div class="progress" id="progress">Score: 0/0</div>
             </div>
 
-            <div class="fretboard-container">
+            <div class="fretboard-container" id="fretboardContainer">
                 <svg id="fretboard" width="1400" height="300"></svg>
             </div>
 
             <div class="note-input-section">
-                <div class="question" id="question">Click to select a note!</div>
+                <div class="question" id="question" data-i18n="question"></div>
 
-                <div class="click-to-select" id="noteSelector">
-                    Click here to select a note
-                </div>
+                <div class="click-to-select" id="noteSelector" data-i18n="clickToSelect"></div>
 
                 <div class="result-message" id="result"></div>
             </div>
@@ -657,27 +654,24 @@
     <script>
         const translations = {
             pl: {
-                title: '🎸 Trener Nut na Gryfie',
+                title: '🎸 Trener dźwięków na gryfie',
                 backToHome: '← Powrót do paveu.pl',
                 numberOfFrets: 'Liczba progów',
                 frets12: '12 progów',
                 frets15: '15 progów',
                 frets22: '22 progów',
                 frets24: '24 progów',
-                noteNotation: 'Notacja nut',
+                noteNotation: 'Notacja dźwięku',
                 sharps: 'Krzyżyki (#)',
                 flats: 'Bemole (♭)',
                 both: 'Oba (# i ♭)',
-                sharpsSuffix: ' - C, C#, D, D#, E, F, F#, G, G#, A, A#, B',
-                flatsSuffix: ' - C, Db, D, Eb, E, F, Gb, G, Ab, A, Bb, B',
-                bothSuffix: ' - Wszystkie warianty',
                 stringsToPractice: 'Struny do ćwiczenia',
-                string6: '6. (E)',
-                string5: '5. (A)',
-                string4: '4. (D)',
-                string3: '3. (G)',
-                string2: '2. (B)',
                 string1: '1. (E)',
+                string2: '2. (B)',
+                string3: '3. (G)',
+                string4: '4. (D)',
+                string5: '5. (A)',
+                string6: '6. (E)',
                 theme: 'Motyw',
                 lightMinimal: 'Jasny minimalny',
                 darkMinimal: 'Ciemny minimalny',
@@ -685,8 +679,8 @@
                 menu: '← Menu',
                 skip: '⏭️ Pomiń',
                 score: 'Wynik',
-                question: 'Jaka to nuta?',
-                clickToSelect: 'Kliknij, aby wybrać nutę',
+                question: 'Jaki to dźwięk?',
+                clickToSelect: 'Kliknij, aby wybrać dźwięk',
                 correct: '✓ Poprawnie!',
                 incorrect: '✗ Błąd! Prawidłowa odpowiedź:',
                 selectAtLeastOne: 'Proszę wybrać przynajmniej jedną strunę!',
@@ -712,16 +706,13 @@
                 sharps: 'Sharps (#)',
                 flats: 'Flats (♭)',
                 both: 'Both (# and ♭)',
-                sharpsSuffix: ' - C, C#, D, D#, E, F, F#, G, G#, A, A#, B',
-                flatsSuffix: ' - C, Db, D, Eb, E, F, Gb, G, Ab, A, Bb, B',
-                bothSuffix: ' - All variations',
                 stringsToPractice: 'Strings to Practice',
-                string6: '6th (E)',
-                string5: '5th (A)',
-                string4: '4th (D)',
-                string3: '3rd (G)',
-                string2: '2nd (B)',
                 string1: '1st (E)',
+                string2: '2nd (B)',
+                string3: '3rd (G)',
+                string4: '4th (D)',
+                string5: '5th (A)',
+                string6: '6th (E)',
                 theme: 'Theme',
                 lightMinimal: 'Light Minimal',
                 darkMinimal: 'Dark Minimal',
@@ -746,7 +737,8 @@
             }
         };
 
-        const standardTuning = ['E', 'A', 'D', 'G', 'B', 'E'];
+        // Standard tuning from 1st string (high E) to 6th string (low E)
+        const standardTuning = ['E', 'B', 'G', 'D', 'A', 'E'];
         const chromaticScale = ['C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B'];
 
         class FretboardTrainer {
@@ -786,61 +778,14 @@
             }
 
             updateTranslations() {
-                document.querySelectorAll('h1').forEach(el => el.textContent = this.t('title'));
-                document.querySelectorAll('.back-to-home').forEach(el => el.textContent = this.t('backToHome'));
+                // Update all elements with data-i18n attribute
+                document.querySelectorAll('[data-i18n]').forEach(element => {
+                    const key = element.getAttribute('data-i18n');
+                    element.textContent = this.t(key);
+                });
 
-                const configSections = document.querySelectorAll('.config-section h3');
-                if (configSections[0]) configSections[0].textContent = this.t('numberOfFrets');
-                if (configSections[1]) configSections[1].textContent = this.t('noteNotation');
-                if (configSections[2]) configSections[2].textContent = this.t('stringsToPractice');
-                if (configSections[3]) configSections[3].textContent = this.t('practiceTimerTitle');
-                if (configSections[4]) configSections[4].textContent = this.t('theme');
-
-                // Update radio labels
-                const radioLabels = document.querySelectorAll('.radio-option span');
-                if (radioLabels[0]) radioLabels[0].textContent = this.t('frets12');
-                if (radioLabels[1]) radioLabels[1].textContent = this.t('frets15');
-                if (radioLabels[2]) radioLabels[2].textContent = this.t('frets22');
-                if (radioLabels[3]) radioLabels[3].textContent = this.t('frets24');
-                if (radioLabels[4]) radioLabels[4].textContent = this.t('sharps') + this.t('sharpsSuffix');
-                if (radioLabels[5]) radioLabels[5].textContent = this.t('flats') + this.t('flatsSuffix');
-                if (radioLabels[6]) radioLabels[6].textContent = this.t('both') + this.t('bothSuffix');
-                if (radioLabels[7]) radioLabels[7].textContent = this.t('noTimer');
-                if (radioLabels[8]) {
-                    const input = radioLabels[8].querySelector('#timerMinutes');
-                    if (input) {
-                        const inputValue = input.value;
-                        radioLabels[8].textContent = this.t('practiceTime') + ' ';
-                        input.value = inputValue;
-                        radioLabels[8].appendChild(input);
-                    }
-                }
-                if (radioLabels[9]) radioLabels[9].textContent = this.t('lightMinimal');
-                if (radioLabels[10]) radioLabels[10].textContent = this.t('darkMinimal');
-
-                const infoBox = document.querySelector('.info-box');
-                if (infoBox) infoBox.textContent = this.t('timerInfo');
-
-                // Update string checkboxes
-                const stringLabels = document.querySelectorAll('.checkbox-option label');
-                if (stringLabels[0]) stringLabels[0].textContent = this.t('string6');
-                if (stringLabels[1]) stringLabels[1].textContent = this.t('string5');
-                if (stringLabels[2]) stringLabels[2].textContent = this.t('string4');
-                if (stringLabels[3]) stringLabels[3].textContent = this.t('string3');
-                if (stringLabels[4]) stringLabels[4].textContent = this.t('string2');
-                if (stringLabels[5]) stringLabels[5].textContent = this.t('string1');
-
-                document.querySelector('.start-button').textContent = this.t('startPractice');
-
-                const buttons = document.querySelectorAll('#mainScreen .btn');
-                if (buttons[0]) buttons[0].textContent = this.t('menu');
-                if (buttons[1]) buttons[1].textContent = this.t('skip');
-
+                // Update score if main screen is visible
                 if (document.getElementById('mainScreen').style.display === 'block') {
-                    const selector = document.getElementById('noteSelector');
-                    if (!this.selectedNote) {
-                        selector.textContent = this.t('clickToSelect');
-                    }
                     this.updateScore();
                 }
             }
@@ -864,7 +809,13 @@
                     });
                 });
 
-                this.updateTranslations();
+                // Set initial language based on browser or default to Polish
+                const browserLang = navigator.language.toLowerCase();
+                if (browserLang.startsWith('en')) {
+                    this.setLanguage('en');
+                } else {
+                    this.setLanguage('pl');
+                }
             }
 
             startApp() {
@@ -1051,6 +1002,7 @@
                     }
                 });
 
+                // Draw strings from top to bottom (1st to 6th)
                 for (let i = 0; i < 6; i++) {
                     const y = 20 + i * stringSpacing;
                     const string = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -1059,7 +1011,7 @@
                     string.setAttribute('x2', 50 + fretCount * fretWidth);
                     string.setAttribute('y2', y);
                     string.setAttribute('stroke', stringColor);
-                    string.setAttribute('stroke-width', 6 - i * 0.5);
+                    string.setAttribute('stroke-width', 1.5 + (5 - i) * 0.5);
                     svg.appendChild(string);
 
                     const stringLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -1129,14 +1081,13 @@
                     modal.appendChild(option);
                 });
 
-                // Position modal below the fretboard
                 const fretboard = document.getElementById('fretboard');
                 const rect = fretboard.getBoundingClientRect();
 
                 modal.style.position = 'fixed';
                 modal.style.left = '50%';
                 modal.style.transform = 'translateX(-50%)';
-                modal.style.top = `${rect.bottom + 20}px`; // 20px below the fretboard
+                modal.style.top = `${rect.bottom + 20}px`;
 
                 modal.classList.add('active');
                 modal.onclick = (e) => e.stopPropagation();
@@ -1261,7 +1212,7 @@
                 } else {
                     stringIndex = this.config.strings[Math.floor(Math.random() * this.config.strings.length)] - 1;
                     fret = Math.floor(Math.random() * (this.config.frets + 1));
-                    const openString = standardTuning[5 - stringIndex];
+                    const openString = standardTuning[stringIndex];
                     note = this.getNoteAtFret(openString, fret);
                 }
 
@@ -1270,7 +1221,7 @@
                 const fretWidth = 80;
                 const stringSpacing = 40;
                 const x = fret === 0 ? 50 : 50 + (fret - 0.5) * fretWidth;
-                const y = 20 + (5 - stringIndex) * stringSpacing;
+                const y = 20 + stringIndex * stringSpacing;
 
                 const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                 highlight.setAttribute('cx', x);
@@ -1278,10 +1229,17 @@
                 highlight.setAttribute('r', '20');
                 highlight.setAttribute('fill', 'var(--accent)');
                 highlight.setAttribute('opacity', '0.7');
+                highlight.setAttribute('stroke', '#ffffff');
+                highlight.setAttribute('stroke-width', '3');
                 highlight.setAttribute('class', 'highlight-circle');
                 svg.appendChild(highlight);
 
-                highlight.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+                // Scroll to the highlighted note
+                const container = document.getElementById('fretboardContainer');
+                const circleLeft = x - 50;
+                const scrollPosition = circleLeft - container.clientWidth / 2;
+                container.scrollTo({ left: Math.max(0, scrollPosition), behavior: 'smooth' });
+
                 document.getElementById('question').textContent = this.t('question');
             }
 
@@ -1322,7 +1280,6 @@
                     selector.classList.remove('correct');
                     selector.classList.add('incorrect');
 
-                    // Record mistake (only in normal mode with timer, not in review mode)
                     if (!this.reviewMode && this.timerMode) {
                         const mistakeExists = this.mistakes.some(m =>
                             m.stringIndex === this.currentQuestion.stringIndex && m.fret === this.currentQuestion.fret
@@ -1336,12 +1293,10 @@
                         }
                     }
 
-                    // In timer mode or review mode: auto-advance after 2 seconds
                     if (this.timerMode || this.reviewMode) {
                         this.selectedNote = null;
                         setTimeout(() => this.nextQuestion(), 2000);
                     } else {
-                        // In normal mode without timer: allow retry
                         this.selectedNote = null;
                     }
                 }
