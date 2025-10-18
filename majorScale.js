@@ -2,7 +2,7 @@
 const translations = {
     en: {
         title: '🎵 The Major Key Chords Chart',
-        backToHome: '← Back to paveu.pl',
+        backToHome: '← Back to https://paveu.pl/#music-theory',
         exerciseMode: 'Exercise Mode',
         allScales: 'All scales (15 scales)',
         selectScales: 'Select scales to practice',
@@ -73,7 +73,7 @@ const translations = {
     },
     pl: {
         title: '🎵 Tabela Akordów w Tonacji Durowej',
-        backToHome: '← Powrót do paveu.pl',
+        backToHome: '← Powrót do https://paveu.pl/#music-theory',
         exerciseMode: 'Tryb ćwiczenia',
         allScales: 'Wszystkie gamy (15 gam)',
         selectScales: 'Wybierz gamy do ćwiczenia',
