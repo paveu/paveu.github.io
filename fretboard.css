@@ -428,7 +428,6 @@ h1 {
     border: 2px solid var(--border-color);
     border-radius: 8px;
     padding: 8px;
-    padding-top: 40px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     max-height: 400px;
     height: 400px;
