@@ -176,6 +176,7 @@
                 </div>
                 <div class="progress" id="progress"></div>
                 <button class="btn" id="checkBtn" onclick="App.checkAllAnswers()" data-i18n="check"></button>
+                <button class="btn" onclick="App.showAnswersModal()" data-i18n="showAnswers"></button>
             </div>
 
             <div class="main-content">
@@ -192,7 +193,16 @@
             </div>
         </div>
     </div>
-
+    <!-- Answers modal -->
+    <div id="answersModal" class="answers-modal">
+        <div class="answers-modal-content">
+            <div class="answers-modal-header">
+                <h2 data-i18n="answersModalTitle"></h2>
+                <button class="close-modal-btn" onclick="App.closeAnswersModal()">×</button>
+            </div>
+            <div class="answers-modal-body" id="answersModalBody"></div>
+        </div>
+    </div>
     <!-- Chord selection modal -->
     <div id="chordModal"></div>
 

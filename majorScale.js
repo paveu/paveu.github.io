@@ -69,7 +69,11 @@ const translations = {
         validMinutes: 'Please enter a valid number of minutes (1-120)',
         timeUp: '⏰ Time is up! Practice session completed.',
         resetConfirm: 'Reset will restart the timer. Continue?',
-        clearRowTitle: 'Clear all chords in this scale'
+        clearRowTitle: 'Clear all chords in this scale',
+        showAnswers: 'Show Answers',
+        hideAnswers: 'Hide Answers',
+        answersModalTitle: 'All Correct Answers',
+
     },
     pl: {
         title: '🎵 Tabela Akordów w Tonacji Durowej',
@@ -140,7 +144,10 @@ const translations = {
         validMinutes: 'Proszę podać prawidłową liczbę minut (1-120)',
         timeUp: '⏰ Czas minął! Sesja ćwiczeń zakończona.',
         resetConfirm: 'Reset zrestartuje timer. Kontynuować?',
-        clearRowTitle: 'Wyczyść wszystkie akordy w tej gamie'
+        clearRowTitle: 'Wyczyść wszystkie akordy w tej gamie',
+        showAnswers: 'Pokaż odpowiedzi',
+        hideAnswers: 'Ukryj odpowiedzi',
+        answersModalTitle: 'Wszystkie poprawne odpowiedzi',
     }
 };
 
@@ -246,7 +253,20 @@ class MusicTheoryApp {
         // Update all text on the page
         this.updateTranslations();
     }
+    // Setup answers modal event listeners
+    setupAnswersModalEventListeners() {
+        const modal = document.getElementById('answersModal');
 
+        const handleClickOutside = (e) => {
+            const modalContent = document.querySelector('.answers-modal-content');
+            if (!modalContent.contains(e.target)) {
+                this.closeAnswersModal();
+                modal.removeEventListener('click', handleClickOutside);
+            }
+        };
+
+        modal.addEventListener('click', handleClickOutside);
+    }
     // Update all translations on the page
     updateTranslations() {
         // Update elements with data-i18n attribute
@@ -263,8 +283,46 @@ class MusicTheoryApp {
 
         // Rebuild table if it exists (to update headers)
         if (this.elements.mainScreen.style.display === 'block') {
+            // Save current user answers before rebuilding
+            const savedAnswers = { ...this.userAnswers };
+
             this.buildTable();
+
+            // Restore user answers after rebuilding
+            this.userAnswers = savedAnswers;
+
+            // Restore chords in cells
+            Object.keys(this.userAnswers).forEach(key => {
+                const [scale, degree] = key.split('-');
+                const row = this.elements.scalesTable.querySelector(`tr[data-scale="${scale}"]`);
+                if (row) {
+                    const dropZones = row.querySelectorAll('.drop-zone');
+                    const dropZone = dropZones[parseInt(degree)];
+                    if (dropZone) {
+                        const chord = this.userAnswers[key];
+
+                        const chordText = document.createElement('span');
+                        chordText.className = 'chord-text';
+                        chordText.textContent = chord;
+                        dropZone.appendChild(chordText);
+
+                        dropZone.classList.add(CSS_CLASSES.FILLED);
+
+                        if (this.config.validation === 'instant') {
+                            this.validateCell(dropZone, scale, parseInt(degree));
+                        }
+                    }
+                }
+            });
+
             this.updateProgress();
+            this.updateScaleClearButtons();
+        }
+
+        // Update answers modal title if it exists
+        const answersModalTitle = document.querySelector('#answersModal h2');
+        if (answersModalTitle) {
+            answersModalTitle.textContent = this.t('answersModalTitle');
         }
     }
 
@@ -983,7 +1041,81 @@ class MusicTheoryApp {
 
         return { top, left };
     }
+    // Show answers modal
+    showAnswersModal() {
+        try {
+            const modal = document.getElementById('answersModal');
+            const modalBody = document.getElementById('answersModalBody');
 
+            modalBody.innerHTML = '';
+
+            const table = document.createElement('table');
+            table.className = 'answers-table';
+
+            // Header
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+
+            const headers = [
+                this.t('scale'),
+                'I', 'II', 'III', 'IV', 'V', 'VI', 'VII'
+            ];
+
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+
+            // Body
+            const tbody = document.createElement('tbody');
+
+            this.config.selectedScales.forEach(scale => {
+                const row = document.createElement('tr');
+
+                const scaleCell = document.createElement('td');
+                scaleCell.textContent = scale;
+                scaleCell.style.fontWeight = 'bold';
+                row.appendChild(scaleCell);
+
+                scalesData[scale].chords.forEach((chord, index) => {
+                    const cell = document.createElement('td');
+                    cell.textContent = chord;
+
+                    if (index === 0 || index === 3 || index === 4) {
+                        cell.classList.add('cell-primary');
+                    } else if (index === 1 || index === 2 || index === 5) {
+                        cell.classList.add('cell-secondary');
+                    } else if (index === 6) {
+                        cell.classList.add('cell-diminished');
+                    }
+
+                    row.appendChild(cell);
+                });
+
+                tbody.appendChild(row);
+            });
+
+            table.appendChild(tbody);
+            modalBody.appendChild(table);
+
+            modal.style.display = 'flex';
+
+            // Setup click outside listener
+            this.setupAnswersModalEventListeners();
+        } catch (error) {
+            console.error('Error showing answers modal:', error);
+        }
+    }
+
+    // Close answers modal
+    closeAnswersModal() {
+        const modal = document.getElementById('answersModal');
+        modal.style.display = 'none';
+    }
     // Show chord dropdown
     showChordDropdown(dropZone) {
         try {
