@@ -1058,7 +1058,8 @@ class MusicTheoryApp {
 
             const headers = [
                 this.t('scale'),
-                'I', 'II', 'III', 'IV', 'V', 'VI', 'VII'
+                'I', 'II', 'III', 'IV', 'V', 'VI', 'VII',
+                this.t('numAccidentals')
             ];
 
             headers.forEach(header => {
@@ -1095,6 +1096,11 @@ class MusicTheoryApp {
 
                     row.appendChild(cell);
                 });
+
+                const accidentalsCell = document.createElement('td');
+                accidentalsCell.textContent = scalesData[scale].accidentals;
+                accidentalsCell.className = 'info-cell';
+                row.appendChild(accidentalsCell);
 
                 tbody.appendChild(row);
             });
