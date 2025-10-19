@@ -43,7 +43,9 @@ const translations = {
         noMistakes: '🎉 Brawo! Nie masz błędnych odpowiedzi do powtórki!',
         timeUp: '⏰ Czas minął! Rozpoczynamy powtórkę błędów...',
         validMinutes: 'Proszę podać prawidłową liczbę minut (1-120)',
-        invalidFretRange: 'Proszę podać prawidłowy zakres progów (1-24, od ≤ do)'
+        invalidFretRange: 'Proszę podać prawidłowy zakres progów (1-24, od ≤ do)',
+        showAllNotes: 'Pokaż dźwięki',
+        allNotesOnFretboard: 'Wszystkie dźwięki na gryfie',
     },
     en: {
         title: '🎸 Fretboard Notes Trainer',
@@ -89,7 +91,9 @@ const translations = {
         noMistakes: '🎉 Great! You have no mistakes to review!',
         timeUp: '⏰ Time is up! Starting mistake review...',
         validMinutes: 'Please enter a valid number of minutes (1-120)',
-        invalidFretRange: 'Please enter a valid fret range (1-24, from ≤ to)'
+        invalidFretRange: 'Please enter a valid fret range (1-24, from ≤ to)',
+        showAllNotes: 'Show Notes',
+        allNotesOnFretboard: 'All Notes on Fretboard',
     }
 };
 
@@ -821,6 +825,180 @@ class FretboardTrainer {
         }
 
         progress.textContent = scoreText;
+    }
+    showFretboardNotesModal() {
+        const modal = document.getElementById('fretboardNotesModal');
+        modal.style.display = 'flex';
+        this.drawFretboardWithAllNotes();
+
+        // Add click handler for closing modal when clicking outside
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                this.closeFretboardNotesModal();
+            }
+        };
+    }
+
+    closeFretboardNotesModal() {
+        const modal = document.getElementById('fretboardNotesModal');
+        modal.style.display = 'none';
+    }
+
+    drawFretboardWithAllNotes() {
+        const svg = document.getElementById('fretboardWithNotes');
+        svg.innerHTML = '';
+
+        const fretCount = this.config.fretTo;
+        const fretWidth = 80;
+        const stringSpacing = 40;
+        const svgWidth = (fretCount + 1) * fretWidth + 100;
+        const svgHeight = 6 * stringSpacing + 40;
+
+        svg.setAttribute('width', svgWidth);
+        svg.setAttribute('height', svgHeight);
+        svg.setAttribute('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
+
+        const woodColor = getComputedStyle(document.documentElement).getPropertyValue('--fretboard-wood').trim();
+        const fretColor = getComputedStyle(document.documentElement).getPropertyValue('--fret-wire').trim();
+        const stringColor = getComputedStyle(document.documentElement).getPropertyValue('--string-color').trim();
+        const dotColor = getComputedStyle(document.documentElement).getPropertyValue('--dot-color').trim();
+
+        const fretboard = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        fretboard.setAttribute('x', '50');
+        fretboard.setAttribute('y', '20');
+        fretboard.setAttribute('width', fretCount * fretWidth);
+        fretboard.setAttribute('height', 5 * stringSpacing);
+        fretboard.setAttribute('fill', woodColor);
+        fretboard.setAttribute('rx', '5');
+        svg.appendChild(fretboard);
+
+        for (let i = 0; i <= fretCount; i++) {
+            const x = 50 + i * fretWidth;
+            const fret = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            fret.setAttribute('x1', x);
+            fret.setAttribute('y1', '20');
+            fret.setAttribute('x2', x);
+            fret.setAttribute('y2', 20 + 5 * stringSpacing);
+            fret.setAttribute('stroke', fretColor);
+            fret.setAttribute('stroke-width', i === 0 ? '6' : '3');
+            svg.appendChild(fret);
+
+            if (i > 0) {
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', x - fretWidth / 2);
+                text.setAttribute('y', 5 * stringSpacing + 50);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('fill', 'var(--text-secondary)');
+                text.setAttribute('font-size', '14');
+                text.textContent = i;
+                svg.appendChild(text);
+            }
+        }
+
+        const dotFrets = [3, 5, 7, 9, 12, 15, 17, 19, 21, 24];
+        const doubleDotFrets = [12, 24];
+
+        dotFrets.forEach(fret => {
+            if (fret <= fretCount) {
+                const x = 50 + (fret - 0.5) * fretWidth;
+                if (doubleDotFrets.includes(fret)) {
+                    [1.5, 3.5].forEach(yPos => {
+                        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                        dot.setAttribute('cx', x);
+                        dot.setAttribute('cy', 20 + yPos * stringSpacing);
+                        dot.setAttribute('r', '8');
+                        dot.setAttribute('fill', dotColor);
+                        svg.appendChild(dot);
+                    });
+                } else {
+                    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    dot.setAttribute('cx', x);
+                    dot.setAttribute('cy', 20 + 2.5 * stringSpacing);
+                    dot.setAttribute('r', '8');
+                    dot.setAttribute('fill', dotColor);
+                    svg.appendChild(dot);
+                }
+            }
+        });
+
+        for (let i = 0; i < 6; i++) {
+            const y = 20 + i * stringSpacing;
+            const string = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            string.setAttribute('x1', '50');
+            string.setAttribute('y1', y);
+            string.setAttribute('x2', 50 + fretCount * fretWidth);
+            string.setAttribute('y2', y);
+            string.setAttribute('stroke', stringColor);
+            string.setAttribute('stroke-width', 1.5 + (5 - i) * 0.5);
+            svg.appendChild(string);
+
+            const stringLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            stringLabel.setAttribute('x', '30');
+            stringLabel.setAttribute('y', y + 5);
+            stringLabel.setAttribute('text-anchor', 'middle');
+            stringLabel.setAttribute('fill', 'var(--text-primary)');
+            stringLabel.setAttribute('font-size', '16');
+            stringLabel.setAttribute('font-weight', 'bold');
+            stringLabel.textContent = standardTuning[i];
+            svg.appendChild(stringLabel);
+        }
+
+        // Color map for notes
+        const noteColors = {
+            'A': '#FF8C00',      // orange
+            'B': '#DC143C',      // red
+            'C': '#8B00FF',      // purple
+            'D': '#1E90FF',      // blue
+            'E': '#8B4513',      // brown
+            'F': '#00CED1',      // light blue
+            'G': '#32CD32'       // green
+        };
+
+        // Add all notes to the fretboard
+        for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
+            for (let fret = this.config.fretFrom; fret <= this.config.fretTo; fret++) {
+                const openString = standardTuning[stringIndex];
+                const note = this.getNoteAtFret(openString, fret);
+                const displayNote = this.formatNote(note);
+
+                const x = 50 + (fret - 0.5) * fretWidth;
+                const y = 20 + stringIndex * stringSpacing;
+
+                // Check if it's a sharp/flat
+                const isAccidental = displayNote.includes('#') || displayNote.includes('b') || displayNote.includes('/');
+
+                // Extract base note (first letter)
+                const baseNote = displayNote.charAt(0);
+
+                // Select color
+                let noteColor;
+                if (isAccidental) {
+                    noteColor = '#2a2a2a';  // black for sharp/flat
+                } else {
+                    noteColor = noteColors[baseNote] || '#4caf50';
+                }
+
+                // Background circle for the note
+                const noteCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                noteCircle.setAttribute('cx', x);
+                noteCircle.setAttribute('cy', y);
+                noteCircle.setAttribute('r', '18');
+                noteCircle.setAttribute('fill', noteColor);
+                noteCircle.setAttribute('opacity', '0.9');
+                svg.appendChild(noteCircle);
+
+                const noteText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                noteText.setAttribute('x', x);
+                noteText.setAttribute('y', y);
+                noteText.setAttribute('text-anchor', 'middle');
+                noteText.setAttribute('dominant-baseline', 'central');
+                noteText.setAttribute('fill', 'white');
+                noteText.setAttribute('font-size', displayNote.length > 2 ? '11' : '14');
+                noteText.setAttribute('font-weight', 'bold');
+                noteText.textContent = displayNote;
+                svg.appendChild(noteText);
+            }
+        }
     }
 }
 

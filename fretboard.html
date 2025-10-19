@@ -184,6 +184,7 @@
                     ⏱️ <span id="timerText">00:00</span>
                 </div>
                 <div class="progress" id="progress" data-i18n="initialScore"></div>
+                <button class="btn" onclick="App.showFretboardNotesModal()" data-i18n="showAllNotes"></button>
             </div>
 
             <div class="fretboard-container" id="fretboardContainer">
@@ -199,7 +200,15 @@
             </div>
         </div>
     </div>
-
+    <div id="fretboardNotesModal" class="fretboard-notes-modal">
+        <div class="fretboard-notes-modal-content">
+            <button class="close-modal-btn" onclick="App.closeFretboardNotesModal()">×</button>
+            <h2 data-i18n="allNotesOnFretboard"></h2>
+            <div class="fretboard-notes-container">
+                <svg id="fretboardWithNotes" width="1400" height="300"></svg>
+            </div>
+        </div>
+    </div>
     <div id="noteModal"></div>
 
     <script src="fretboard.js"></script>
