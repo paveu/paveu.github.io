@@ -575,4 +575,21 @@ h1 {
     .btn, .progress, .timer-display {
         width: 100%;
     }
+
+    #noteModal {
+        width: 85%;
+        max-width: 200px;
+        max-height: 40vh;
+        height: auto;
+    }
+
+    .modal-option {
+        padding: 8px 10px;
+        font-size: 0.95em;
+    }
+
+    .click-to-select {
+        padding: 12px;
+        font-size: 0.95em;
+    }
 }

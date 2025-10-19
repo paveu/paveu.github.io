@@ -1,7 +1,7 @@
 const translations = {
     pl: {
         title: '🎸 Trener dźwięków na gryfie',
-        backToHome: '← Powrót do https://paveu.pl/#music-theory',
+        backToHome: '← Powrót',
         fretRange: 'Zakres progów',
         frets12: '12 progów',
         frets15: '15 progów',
@@ -49,7 +49,7 @@ const translations = {
     },
     en: {
         title: '🎸 Fretboard Notes Trainer',
-        backToHome: '← Back to https://paveu.pl/#music-theory',
+        backToHome: '← Go back',
         fretRange: 'Fret Range',
         frets12: '12 frets',
         frets15: '15 frets',
