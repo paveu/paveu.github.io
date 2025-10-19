@@ -46,14 +46,17 @@
 </head>
 <body>
     <div class="container">
-        <div class="language-switcher">
-            <button id="langEN" onclick="App.setLanguage('en')">EN</button>
-            <button id="langPL" onclick="App.setLanguage('pl')">PL</button>
+        <a href="https://paveu.pl/#music-theory" class="back-to-home back-to-home-desktop" data-i18n="backToHome"></a>
+
+        <div class="top-nav">
+            <a href="https://paveu.pl/#music-theory" class="back-to-home back-to-home-mobile" data-i18n="backToHome"></a>
+            <div class="language-switcher">
+                <button id="langEN" onclick="App.setLanguage('en')">EN</button>
+                <button id="langPL" onclick="App.setLanguage('pl')">PL</button>
+            </div>
         </div>
 
         <div id="startScreen">
-            <a href="https://paveu.pl/#music-theory" class="back-to-home" data-i18n="backToHome"></a>
-
             <h1 data-i18n="title"></h1>
 
             <div class="config-section">
@@ -173,18 +176,16 @@
         </div>
 
         <div id="mainScreen">
-            <a href="https://paveu.pl/#music-theory" class="back-to-home" data-i18n="backToHome"></a>
-
             <h1 data-i18n="title"></h1>
 
             <div class="controls">
+                <button class="btn" onclick="App.showFretboardNotesModal()" data-i18n="showAllNotes"></button>
                 <button class="btn" onclick="App.showStartScreen()" data-i18n="menu"></button>
                 <button class="btn" onclick="App.nextQuestion()" data-i18n="skip"></button>
                 <div id="timerDisplay" class="timer-display" style="display: none;">
                     ⏱️ <span id="timerText">00:00</span>
                 </div>
                 <div class="progress" id="progress" data-i18n="initialScore"></div>
-                <button class="btn" onclick="App.showFretboardNotesModal()" data-i18n="showAllNotes"></button>
             </div>
 
             <div class="fretboard-container" id="fretboardContainer">

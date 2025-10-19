@@ -63,7 +63,7 @@ h1 {
     font-size: 2em;
 }
 
-.back-to-home {
+.back-to-home-desktop {
     position: fixed;
     top: 20px;
     left: 20px;
@@ -78,23 +78,47 @@ h1 {
     z-index: 1000;
 }
 
-.back-to-home:hover {
+.back-to-home-desktop:hover {
     background: var(--hover-bg);
     border-color: var(--accent);
     transform: translateX(-3px);
 }
 
-.language-switcher {
+.back-to-home-mobile {
+    padding: 10px 20px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: none;
+}
+
+.back-to-home-mobile:hover {
+    background: var(--hover-bg);
+    border-color: var(--accent);
+    transform: translateX(3px);
+}
+
+.top-nav {
     position: fixed;
     top: 20px;
     right: 20px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    z-index: 1000;
+}
+
+.language-switcher {
     display: flex;
     gap: 5px;
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 5px;
-    z-index: 1000;
 }
 
 .language-switcher button {
@@ -325,7 +349,6 @@ h1 {
     max-width: 1400px;
     margin: 0 auto;
     overflow-x: auto;
-    padding: 20px;
     scroll-behavior: smooth;
 }
 
@@ -336,7 +359,7 @@ h1 {
 
 .note-input-section {
     max-width: 600px;
-    margin: 30px auto;
+    margin: 0 auto;
     text-align: center;
     position: relative;
 }
@@ -563,9 +586,18 @@ h1 {
         font-size: 1.5em;
     }
 
-    .back-to-home, .language-switcher {
+    .back-to-home-desktop {
+        display: none;
+    }
+
+    .back-to-home-mobile {
+        display: block;
+    }
+
+    .top-nav {
         position: static;
         margin-bottom: 20px;
+        justify-content: flex-end;
     }
 
     .controls {
