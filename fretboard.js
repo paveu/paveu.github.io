@@ -100,7 +100,7 @@ const translations = {
 // Standard tuning from 1st string (high E) to 6th string (low E)
 const standardTuning = ['E', 'B', 'G', 'D', 'A', 'E'];
 const chromaticScale = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-const chromaticScaleFlats = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab','A', 'Bb', 'B'];
+const chromaticScaleFlats = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭','A', 'B♭', 'B'];
 
 class FretboardTrainer {
     constructor() {
@@ -457,10 +457,10 @@ class FretboardTrainer {
         if (this.config.notation === 'sharps') {
             noteList = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
         } else if (this.config.notation === 'flats') {
-            noteList = ['A', 'Bb', 'B', 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab'];
+            noteList = ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭'];
         } else {
             // Both notation - show combined format
-            noteList = ['A', 'A#/Bb', 'B', 'C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab'];
+            noteList = ['A', 'A#/B♭', 'B', 'C', 'C#/D♭', 'D', 'D#/E♭', 'E', 'F', 'F#/G♭', 'G', 'G#/A♭'];
         }
 
         noteList.forEach(note => {
@@ -752,7 +752,7 @@ class FretboardTrainer {
     }
 
     isEnharmonicMatch(userAnswer, correctNote) {
-        // Extract base notes from combined format like "C#/Db"
+        // Extract base notes from combined format like "C#/D♭"
         const extractNotes = (note) => {
             if (note.includes('/')) {
                 return note.split('/');
@@ -772,11 +772,11 @@ class FretboardTrainer {
 
         // Additional enharmonic check
         const enharmonicMap = {
-            'C#': ['C#', 'Db'], 'Db': ['C#', 'Db'],
-            'D#': ['D#', 'Eb'], 'Eb': ['D#', 'Eb'],
-            'F#': ['F#', 'Gb'], 'Gb': ['F#', 'Gb'],
-            'G#': ['G#', 'Ab'], 'Ab': ['G#', 'Ab'],
-            'A#': ['A#', 'Bb'], 'Bb': ['A#', 'Bb']
+            'C#': ['C#', 'D♭'], 'D♭': ['C#', 'D♭'],
+            'D#': ['D#', 'E♭'], 'E♭': ['D#', 'E♭'],
+            'F#': ['F#', 'G♭'], 'G♭': ['F#', 'G♭'],
+            'G#': ['G#', 'A♭'], 'A♭': ['G#', 'A♭'],
+            'A#': ['A#', 'B♭'], 'B♭': ['A#', 'B♭']
         };
 
         for (const un of userNotes) {
@@ -795,19 +795,19 @@ class FretboardTrainer {
 
     formatNote(note) {
         if (this.config.notation === 'sharps') {
-            const sharpMap = { 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#' };
+            const sharpMap = { 'D♭': 'C#', 'E♭': 'D#', 'G♭': 'F#', 'A♭': 'G#', 'B♭': 'A#' };
             return sharpMap[note] || note;
         } else if (this.config.notation === 'flats') {
-            const flatMap = { 'C#': 'Db', 'D#': 'Eb', 'F#': 'Gb', 'G#': 'Ab', 'A#': 'Bb' };
+            const flatMap = { 'C#': 'D♭', 'D#': 'E♭', 'F#': 'G♭', 'G#': 'A♭', 'A#': 'B♭' };
             return flatMap[note] || note;
         } else {
             // Both notation - show combined format
             const bothMap = {
-                'C#': 'C#/Db', 'Db': 'C#/Db',
-                'D#': 'D#/Eb', 'Eb': 'D#/Eb',
-                'F#': 'F#/Gb', 'Gb': 'F#/Gb',
-                'G#': 'G#/Ab', 'Ab': 'G#/Ab',
-                'A#': 'A#/Bb', 'Bb': 'A#/Bb'
+                'C#': 'C#/D♭', 'D♭': 'C#/D♭',
+                'D#': 'D#/E♭', 'E♭': 'D#/E♭',
+                'F#': 'F#/G♭', 'G♭': 'F#/G♭',
+                'G#': 'G#/A♭', 'A♭': 'G#/A♭',
+                'A#': 'A#/B♭', 'B♭': 'A#/B♭'
             };
             return bothMap[note] || note;
         }
