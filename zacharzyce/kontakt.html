@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kontakt - Stowarzyszenie Nabywców Lokali Apartamenty Kościuszki">
+    <title>Kontakt - Stowarzyszenie Nabywców Lokali</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-banner" class="cookie-banner">
+        <div class="cookie-content">
+            <p>Ta strona wykorzystuje pliki cookies w celach funkcjonalnych. Kontynuując przeglądanie, wyrażasz zgodę na ich użycie. <a href="index.html#rodo">Więcej informacji</a></p>
+            <button id="accept-cookies" class="btn-accept">Akceptuję</button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-logo">
+                <a href="index.html"><img src="logo.jpg" alt="Logo Stowarzyszenia"></a>
+            </div>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="index.html#home">Start</a></li>
+                <li><a href="index.html#o-nas">O nas</a></li>
+                <li><a href="index.html#misja">Misja</a></li>
+                <li><a href="index.html#regulamin">Regulamin</a></li>
+                <li><a href="index.html#rodo">RODO</a></li>
+                <li><a href="index.html#pomoc">Jak pomóc</a></li>
+                <li><a href="kontakt.html" class="btn-contact active">Kontakt</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contact Hero -->
+    <section class="contact-hero">
+        <div class="container">
+            <h1>📞 Kontakt</h1>
+            <p>Masz pytania? Chcesz dołączyć do stowarzyszenia? Skontaktuj się z nami!</p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+        <div class="container">
+            <div class="contact-grid">
+                <!-- Contact Information -->
+                <div class="contact-info">
+                    <h2>Dane kontaktowe</h2>
+                    <div class="contact-item">
+                        <div class="contact-icon">📧</div>
+                        <div>
+                            <h3>Email</h3>
+                            <p><a href="mailto:stowarzyszeniekosciuszki@gmail.com">stowarzyszeniekosciuszki@gmail.com</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">📍</div>
+                        <div>
+                            <h3>Lokalizacja</h3>
+                            <p>Wrocław – Zacharzyce<br>Polska</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">🔐</div>
+                        <div>
+                            <h3>Sprawy RODO</h3>
+                            <p><a href="mailto:rodo@apartamentykosciuszki.pl">rodo@apartamentykosciuszki.pl</a></p>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h3>💡 Ważne informacje</h3>
+                        <p>Odpowiadamy na wiadomości w dni robocze w godzinach 9:00-17:00.</p>
+                        <p>W sprawach pilnych prosimy o wyraźne zaznaczenie tego w tytule wiadomości.</p>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="contact-form-wrapper">
+                    <h2>Formularz kontaktowy</h2>
+                    <form id="contact-form" class="contact-form">
+                        <div class="form-group">
+                            <label for="name">Imię i nazwisko *</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Telefon</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject">Temat *</label>
+                            <select id="subject" name="subject" required>
+                                <option value="">Wybierz temat</option>
+                                <option value="membership">Chcę dołączyć do stowarzyszenia</option>
+                                <option value="info">Prośba o informacje</option>
+                                <option value="support">Potrzebuję wsparcia</option>
+                                <option value="cooperation">Propozycja współpracy</option>
+                                <option value="rodo">Sprawy RODO</option>
+                                <option value="other">Inne</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Wiadomość *</label>
+                            <textarea id="message" name="message" rows="6" required></textarea>
+                        </div>
+
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="consent" name="consent" required>
+                                <span>Wyrażam zgodę na przetwarzanie moich danych osobowych w celu udzielenia odpowiedzi na przesłane zapytanie zgodnie z <a href="index.html#rodo">Polityką Prywatności</a> *</span>
+                            </label>
+                        </div>
+
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="newsletter" name="newsletter">
+                                <span>Chcę otrzymywać newsletter z informacjami o działaniach stowarzyszenia</span>
+                            </label>
+                        </div>
+
+                        <div class="rodo-info">
+                            <p><small>Administrator danych: Stowarzyszenie Nabywców Lokali "Apartamenty Kościuszki Wrocław – Zacharzyce". Więcej informacji w <a href="index.html#rodo">Polityce Prywatności</a>.</small></p>
+                        </div>
+
+                        <button type="submit" class="btn-primary">Wyślij wiadomość</button>
+                    </form>
+
+                    <div id="form-message" class="form-message"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="container">
+            <h2>❓ Często zadawane pytania</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3>Jak mogę dołączyć do stowarzyszenia?</h3>
+                    <p>Skontaktuj się z nami przez formularz kontaktowy, wybierając temat "Chcę dołączyć do stowarzyszenia". Prześlemy Ci szczegółowe informacje oraz formularz członkowski.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Czy członkostwo jest płatne?</h3>
+                    <p>Informacje o ewentualnych składkach członkowskich znajdują się w regulaminie stowarzyszenia. Skontaktuj się z nami, aby uzyskać szczegółowe informacje.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Jak długo czekać na odpowiedź?</h3>
+                    <p>Staramy się odpowiadać na wszystkie wiadomości w ciągu 2-3 dni roboczych. W sprawach pilnych prosimy o zaznaczenie tego w temacie.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Czy mogę wycofać zgodę na przetwarzanie danych?</h3>
+                    <p>Tak, w każdej chwili możesz wycofać zgodę na przetwarzanie danych osobowych. Skontaktuj się z nami na adres rodo@apartamentykosciuszki.pl</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Stowarzyszenie Nabywców Lokali</h4>
+                    <p>Apartamenty Kościuszki<br>Wrocław – Zacharzyce</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Kontakt</h4>
+                    <p>Email: <a href="mailto:stowarzyszeniekosciuszki@gmail.com">stowarzyszeniekosciuszki@gmail.com</a></p>
+                    <p><a href="kontakt.html">Formularz kontaktowy</a></p>
+                </div>
+                <div class="footer-section">
+                    <h4>Informacje prawne</h4>
+                    <p><a href="index.html#regulamin">Regulamin</a></p>
+                    <p><a href="index.html#rodo">Polityka prywatności</a></p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Stowarzyszenie Nabywców Lokali "Apartamenty Kościuszki Wrocław – Zacharzyce". Wszelkie prawa zastrzeżone.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
